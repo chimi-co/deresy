@@ -1,9 +1,9 @@
+// SPDX-License-Identifier: MIT
 pragma solidity 0.8.10;
-
 contract DeresyRequestsV2 {
-
+    
     enum QuestionType {Text, Checkbox}
-
+    
     struct reviewForm {
         string[] questions;
         QuestionType[] questionTypes;
@@ -15,11 +15,11 @@ contract DeresyRequestsV2 {
       uint8 targetIndex;
       string[] answers;
     }
-
+    
     struct ReviewRequest {
       address sponsor;
       address[] reviewers;
-      string[] targets;
+      uint8[] targets;
       string formIpfsHash;
       uint256 rewardPerReview;
       Review[] reviews;
@@ -29,7 +29,9 @@ contract DeresyRequestsV2 {
     }
 
     mapping(string => ReviewRequest) private reviewRequests;
+
     mapping(string => Review[]) private reviews;
+
     reviewForm[] reviewForms;
 
     //creating ReviewForm
@@ -41,14 +43,14 @@ contract DeresyRequestsV2 {
         return reviewForms.length - 1;
     }
 
-    // Creating a request
-    function createRequest(string memory _name, address[] memory reviewers, string[] memory targets, string memory formIpfsHash, uint256 rewardPerReview, uint256 reviewFormIndex) external payable{
+    // Creating a request 
+    function createRequest(string memory _name, address[] memory reviewers, uint8[] memory targets, string memory formIpfsHash, uint256 rewardPerReview, uint256 reviewFormIndex) external payable{
         require(reviewers.length > 0,"Deresy: Reviewers cannot be null");
         require(reviewFormIndex <= reviewForms.length - 1,"Deresy: ReviewFormIndex invalid");
         require(targets.length == reviewers.length,"Deresy: Needs to be same number of arguments for targets as well for reviewers");
         require(rewardPerReview > 0,"Deresy: rewardPerReview cannot be empty");
-        require(msg.value >= (reviewers.length * targets.length * rewardPerReview),"Deresy: msg.value invalid");
-
+        require(reviewRequests[_name].sponsor == address(0),"Deresy: Name duplicated");
+        require(msg.value >= ((reviewers.length * targets.length) * rewardPerReview),"Deresy: msg.value invalid");
         reviewRequests[_name].sponsor = msg.sender;
         reviewRequests[_name].reviewers = reviewers;
         reviewRequests[_name].targets = targets;
@@ -61,31 +63,39 @@ contract DeresyRequestsV2 {
 
     function submitReview(string memory _name, uint8 targetIndex, string memory reviewIpfsHash, string[] memory answers) external {
         require(reviewRequests[_name].isClosed == false,"Deresy: request closed");
-
-        if(reviewRequests[_name].fundsLeft < reviewRequests[_name].rewardPerReview){
-            revert();
+        for (uint i = 0; i < reviewRequests[_name].reviewers.length; i++){
+            if(reviewRequests[_name].reviewers[i] == msg.sender){
+                for (uint j = 0; j < reviewRequests[_name].targets.length; j++){
+                    if(reviewRequests[_name].targets[j] ==  targetIndex){
+                        require(reviewRequests[_name].reviews[j].reviewer == address(0));
+                        // require(answers.length == reviewForms[reviewRequests[_name].reviewFormIndex].length);
+                        if(reviewRequests[_name].fundsLeft < reviewRequests[_name].rewardPerReview){
+                            revert();
+                        }
+                        reviewRequests[_name].reviews.push(Review(reviewIpfsHash,msg.sender,targetIndex, answers));
+                        reviewRequests[_name].fundsLeft -= reviewRequests[_name].rewardPerReview;
+                        payable(msg.sender).transfer(reviewRequests[_name].rewardPerReview);
+                    }       
+                }
+            }
         }
 
-        reviewRequests[_name].reviews.push(Review(reviewIpfsHash,msg.sender,targetIndex, answers));
-        reviewRequests[_name].fundsLeft -= reviewRequests[_name].rewardPerReview;
-        payable(msg.sender).transfer(reviewRequests[_name].rewardPerReview);
     }
 
     function closeReviewRequest(string memory _name) external{
+        // require(reviewRequests[_name].name, "Deresy: name does not exist");
         require(msg.sender == reviewRequests[_name].sponsor, "Deresy: Its is not the sponsor");
         require(reviewRequests[_name].isClosed == false,"Deresy: request closed");
         require(reviewRequests[_name].isClosed == true || reviewRequests[_name].isClosed == false, "Deresy: Name does not exist");
-    
         payable(reviewRequests[_name].sponsor).transfer(reviewRequests[_name].fundsLeft);
-    
         reviewRequests[_name].isClosed = true;
         reviewRequests[_name].fundsLeft = 0;
     }
-    
-    function getRequest(string memory _name) public view returns (address[] memory reviewers,string[] memory targets,string memory formIpfsHash,uint256 rewardPerReview,Review[] memory review,uint256 reviewFormIndex ){
+
+    function getRequest(string memory _name) public view returns (address[] memory reviewers,uint8[] memory targets,string memory formIpfsHash,uint256 rewardPerReview,Review[] memory review,uint256 reviewFormIndex ){
         return (reviewRequests[_name].reviewers,reviewRequests[_name].targets,reviewRequests[_name].formIpfsHash,reviewRequests[_name].rewardPerReview, reviewRequests[_name].reviews, reviewRequests[_name].reviewFormIndex);
     }
-    
+
     function getReviewForm(uint256 _reviewFormIndex) public view returns(string[] memory, QuestionType[] memory){
         return (reviewForms[_reviewFormIndex].questions,reviewForms[_reviewFormIndex].questionTypes);
     }
