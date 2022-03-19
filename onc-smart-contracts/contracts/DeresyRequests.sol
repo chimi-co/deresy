@@ -19,7 +19,7 @@ contract DeresyRequestsV2 {
     struct ReviewRequest {
       address sponsor;
       address[] reviewers;
-      uint8[] targets;
+      string[] targets;
       string formIpfsHash;
       uint256 rewardPerReview;
       Review[] reviews;
@@ -30,7 +30,7 @@ contract DeresyRequestsV2 {
 
     mapping(string => ReviewRequest) private reviewRequests;
 
-    mapping(string => Review[]) private reviews;
+    // mapping(string => Review[]) private reviews;
 
     reviewForm[] reviewForms;
 
@@ -44,7 +44,7 @@ contract DeresyRequestsV2 {
     }
 
     // Creating a request 
-    function createRequest(string memory _name, address[] memory reviewers, uint8[] memory targets, string memory formIpfsHash, uint256 rewardPerReview, uint256 reviewFormIndex) external payable{
+    function createRequest(string memory _name, address[] memory reviewers, string[] memory targets, string memory formIpfsHash, uint256 rewardPerReview, uint256 reviewFormIndex) external payable{
         require(reviewers.length > 0,"Deresy: Reviewers cannot be null");
         require(reviewFormIndex <= reviewForms.length - 1,"Deresy: ReviewFormIndex invalid");
         require(targets.length == reviewers.length,"Deresy: Needs to be same number of arguments for targets as well for reviewers");
@@ -63,20 +63,21 @@ contract DeresyRequestsV2 {
 
     function submitReview(string memory _name, uint8 targetIndex, string memory reviewIpfsHash, string[] memory answers) external {
         require(reviewRequests[_name].isClosed == false,"Deresy: request closed");
+        require(targetIndex < reviewRequests[_name].targets.length,"Deresy: targetIndex invalid");
+        require(reviewForms[reviewRequests[_name].reviewFormIndex].questions.length == answers.length,"Deresy: Not the same number of questions and answers");
+        // require(reviewRequests[_name].fundsLeft < reviewRequests[_name].rewardPerReview, "Deresy: Funds are less than reward");
+        // bool flag = false;
         for (uint i = 0; i < reviewRequests[_name].reviewers.length; i++){
             if(reviewRequests[_name].reviewers[i] == msg.sender){
-                for (uint j = 0; j < reviewRequests[_name].targets.length; j++){
-                    if(reviewRequests[_name].targets[j] ==  targetIndex){
-                        require(reviewRequests[_name].reviews[j].reviewer == address(0));
-                        // require(answers.length == reviewForms[reviewRequests[_name].reviewFormIndex].length);
-                        if(reviewRequests[_name].fundsLeft < reviewRequests[_name].rewardPerReview){
-                            revert();
-                        }
+                for (uint j = 0; j < reviewRequests[_name].targets.length; j++){     
+                    if(reviewRequests[_name].reviews[j].reviewer != msg.sender){               
                         reviewRequests[_name].reviews.push(Review(reviewIpfsHash,msg.sender,targetIndex, answers));
                         reviewRequests[_name].fundsLeft -= reviewRequests[_name].rewardPerReview;
                         payable(msg.sender).transfer(reviewRequests[_name].rewardPerReview);
-                    }       
+                    }
+
                 }
+
             }
         }
 
@@ -92,12 +93,19 @@ contract DeresyRequestsV2 {
         reviewRequests[_name].fundsLeft = 0;
     }
 
-    function getRequest(string memory _name) public view returns (address[] memory reviewers,uint8[] memory targets,string memory formIpfsHash,uint256 rewardPerReview,Review[] memory review,uint256 reviewFormIndex ){
+    function getRequest(string memory _name) public view returns (address[] memory reviewers,string[] memory targets,string memory formIpfsHash,uint256 rewardPerReview,Review[] memory review,uint256 reviewFormIndex ){
         return (reviewRequests[_name].reviewers,reviewRequests[_name].targets,reviewRequests[_name].formIpfsHash,reviewRequests[_name].rewardPerReview, reviewRequests[_name].reviews, reviewRequests[_name].reviewFormIndex);
     }
 
     function getReviewForm(uint256 _reviewFormIndex) public view returns(string[] memory, QuestionType[] memory){
         return (reviewForms[_reviewFormIndex].questions,reviewForms[_reviewFormIndex].questionTypes);
     }
+
+    // function check2(string memory _name) public view returns(address){
+    //     for (uint i = 0; i < reviewRequests[_name].reviews.length; i++){
+            
+    //         return reviewRequests[_name].reviews[i].reviewer;
+    //     }
+    // }
 
 }
