@@ -23,9 +23,9 @@ contract IpfsDeresyRequests {
     
     // Creating a request
     function createRequest(string memory _name, address[] memory reviewers, string[] memory targets, string memory formIpfsHash, uint256 rewardPerReview) external payable{
-        require(reviewers.length > 0,"Deresy: Reviewers cannot be null");
-        require(targets.length == reviewers.length,"Deresy: Needs to be same number of arguments for targets as well for reviewers");
-        require(rewardPerReview > 0,"Deresy: rewardPerReview cannot be empty");
+        require(reviewers.length > 0,"Deresy: Reviewers cannot be empty");
+        require(targets.length > 0,"Deresy: Targets cannot be empty");
+        require(rewardPerReview > 0,"Deresy: rewardPerReview must be greater than 0");
         require(msg.value >= (reviewers.length * targets.length * rewardPerReview),"Deresy: msg.value invalid");
         
         reviewRequests[_name].sponsor = msg.sender;
