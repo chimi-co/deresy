@@ -1,4 +1,5 @@
-pragma solidity 0.8.10;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.13;
 
 contract IpfsDeresyRequests {
     
@@ -62,8 +63,8 @@ contract IpfsDeresyRequests {
       reviewRequests[_name].fundsLeft = 0;
   }
 
-  function getRequest(string memory _name) public view returns (address[] memory reviewers,string[] memory targets,string memory formIpfsHash,uint256 rewardPerReview,Review[] memory reviews ){
-    return (reviewRequests[_name].reviewers,reviewRequests[_name].targets,reviewRequests[_name].formIpfsHash,reviewRequests[_name].rewardPerReview, reviewRequests[_name].reviews);
+  function getRequest(string memory _name) public view returns (address[] memory reviewers,string[] memory targets,string memory formIpfsHash,uint256 rewardPerReview,Review[] memory reviews, bool isClosed){
+    return (reviewRequests[_name].reviewers,reviewRequests[_name].targets,reviewRequests[_name].formIpfsHash,reviewRequests[_name].rewardPerReview, reviewRequests[_name].reviews, reviewRequests[_name].isClosed);
   }
 
 }
