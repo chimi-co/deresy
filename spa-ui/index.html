@@ -293,8 +293,6 @@
 
       let account;
       let web3;
-      let targetFieldIndex = 0;
-      let reviewerFieldIndex = 0;
       const contractAddress = "0x6dc01D914d846833C47Cd63AD303aaB2c718A325";
 
       const submitReview = async () => {
@@ -493,8 +491,8 @@
 
         targetFields = document.getElementsByName('targets[]');
 
-        targetFields.forEach(function(target, index) {
-          var validationMessage = document.getElementById(`target-validation-${index}`)
+        targetFields.forEach(function(target) {
+          var validationMessage = target.parentNode.parentNode.querySelector('.validation-error');
           if(target.value){
             validationMessage.style = "display:none";
             validTargets = true;
@@ -507,8 +505,8 @@
 
         reviewerFields = document.getElementsByName('reviewers[]');
 
-        reviewerFields.forEach(function(reviewer, index) {
-          var validationMessage = document.getElementById(`reviewer-validation-${index}`)
+        reviewerFields.forEach(function(reviewer) {
+          var validationMessage = reviewer.parentNode.parentNode.querySelector('.validation-error');
           if(reviewer.value){
             var re = /^0x[a-fA-F0-9]{40}$/g;
             if(re.test(reviewer.value)) {
@@ -549,7 +547,11 @@
                 document.getElementById("requestIpfsHashTd").innerHTML = request.formIpfsHash;
                 document.getElementById("requestRewardTd").innerHTML = `${request.rewardPerReview/1000000000000000000} ETH`;
                 document.getElementById("requestClosedTd").innerHTML = request.isClosed;
-                document.getElementById("requestReviewsTd").innerHTML = request.reviews;
+                let reviewsText = ""
+                request.reviews.forEach(review => {
+                  reviewsText += `<strong>Reviewer:</strong> ${review.reviewer}<br><strong>Target Index:</strong> ${review.targetIndex}<br><strong>IPFS Hash:</strong> ${review.reviewIpfsHash}<br><br>`
+                })
+                document.getElementById("requestReviewsTd").innerHTML = reviewsText;
               } else {
                 var requestInfo = document.getElementById("request-info")
                 requestInfo.innerHTML = "Couldn't find a request with that name"
@@ -687,7 +689,6 @@
       const detectMetaMask = () => typeof window.ethereum !== "undefined";
 
       const addTargetInput = () => {
-        targetFieldIndex += 1;
         var pureG = document.createElement('div');
         pureG.className = "pure-g";
         var pureField = document.createElement('div');
@@ -717,14 +718,12 @@
         pureG.appendChild(pureValidation);
         var validationMsg = document.createElement('small');
         validationMsg.className = "validation-error";
-        validationMsg.id = `target-validation-${targetFieldIndex}`;
         pureValidation.appendChild(validationMsg);
         
         document.getElementById("targetWrapper").appendChild(pureG);
       };
 
       const addReviewerInput = () => {
-        reviewerFieldIndex += 1;
         var pureG = document.createElement('div');
         pureG.className = "pure-g";
         var pureField = document.createElement('div');
@@ -754,7 +753,6 @@
         pureG.appendChild(pureValidation);
         var validationMsg = document.createElement('small');
         validationMsg.className = "validation-error";
-        validationMsg.id = `reviewer-validation-${reviewerFieldIndex}`;
         pureValidation.appendChild(validationMsg);
         
         document.getElementById("reviewerWrapper").appendChild(pureG);
@@ -842,7 +840,7 @@
                   </div>
                   <div class="pure-u-1-6"></div>
                   <div class="pure-u-20-24">
-                    <small id="reviewer-validation-0" class="validation-error"></small>
+                    <small class="validation-error"></small>
                   </div>
                 </div>
               </div>
@@ -855,7 +853,7 @@
                   </div>
                   <div class="pure-u-1-6"></div>
                   <div class="pure-u-20-24">
-                    <small id="target-validation-0" class="validation-error"></small>
+                    <small class="validation-error"></small>
                   </div>
                 </div>
               </div>
