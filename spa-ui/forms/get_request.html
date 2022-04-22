@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../../css/app.css">
+    <script src="../../js/app.js"></script>
+    <script src="../../js/forms/getRequest.js"></script>
+    <title>DERESY</title>
+  </head>
+  <body>
+    <div class="header">
+      <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
+        <a class="pure-menu-heading" href="">DERESY</a>
+  
+        <ul class="pure-menu-list">
+          <li class="pure-menu-item"><div class="pure-menu-text" id="enableMM"></div></li>
+          <li class="pure-menu-item" style="margin: 0px 20px 0px 10px">
+            <button id="connectBtn" class="pure-button pure-button-primary" style="display:none">Connect</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="content-wrapper"> 
+      <div class="pure-u-1 l-box">
+        <form class="pure-form pure-form-stacked">
+          <fieldset>
+            <legend class="form-title">Get Review Request</legend>
+            <label>Review Request Name</label>
+            <div class="pure-g">
+              <div class="pure-u-20-24">
+                <input id="getRequestName" type="text" class="pure-input-1" placeholder="Enter the request name" />
+              </div>
+              <div class="pure-u-20-24">
+                <small id="get-request-name-validation" class="validation-error"></small>
+              </div>
+            </div>
+            <button id="getRequestBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
+          </fieldset>
+        </form>
+        <div class="pure-u-1 l-box">
+          <div id="request-info" style="display:none"></div>
+          <div id="request-table" style="display:none">
+            <table class="pure-table">
+              <tbody>
+                <tr class="pure-table-odd">
+                  <td>Reviewers</td>
+                  <td id="requestReviewersTd"></td>
+                </tr>
+                <tr>
+                  <td>Targets</td>
+                  <td id="requestTargetsTd"></td>
+                </tr>
+                <tr class="pure-table-odd">
+                  <td>IPFS Hash</td>
+                  <td id="requestIpfsHashTd"></td>
+                </tr>
+                <tr>
+                  <td>Reward per review</td>
+                  <td id="requestRewardTd"></td>
+                </tr>
+                <tr class="pure-table-odd">
+                  <td>Is closed?</td>
+                  <td id="requestClosedTd"></td>
+                </tr>
+                <tr>
+                  <td>Reviews</td>
+                  <td id="requestReviewsTd"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="../../js/web3.js"></script>
+  </body>
+</html>

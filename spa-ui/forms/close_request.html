@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../../css/app.css">
+    <script src="../../js/app.js"></script>
+    <script src="../../js/forms/closeRequest.js"></script>
+    <title>DERESY</title>
+  </head>
+  <body>
+    <div class="header">
+      <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
+        <a class="pure-menu-heading" href="">DERESY</a>
+  
+        <ul class="pure-menu-list">
+          <li class="pure-menu-item"><div class="pure-menu-text" id="enableMM"></div></li>
+          <li class="pure-menu-item" style="margin: 0px 20px 0px 10px">
+            <button id="connectBtn" class="pure-button pure-button-primary" style="display:none">Connect</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="content-wrapper"> 
+      <div class="pure-u-1 l-box">
+        <form class="pure-form pure-form-stacked">
+          <fieldset>
+            <legend class="form-title">Close Review Request</legend>
+            <label>Review Request Name</label>
+            <div class="pure-g">
+              <div class="pure-u-20-24">
+                <input id="closeRequestName" type="text" class="pure-input-1" placeholder="Enter the request name" />
+              </div>
+              <div class="pure-u-20-24">
+                <small id="close-request-name-validation" class="validation-error"></small>
+              </div>
+            </div>
+            <button id="closeRequestBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
+          </fieldset>
+        </form>
+        <div class="pure-u-1 l-box">
+          <div id="close-request-info"></div>
+        </div>
+      </div>
+    </div>
+    <script src="../../js/web3.js"></script>
+  </body>
+</html>

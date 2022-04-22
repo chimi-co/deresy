@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.10;
-contract DeresyRequestsV2 {
+pragma solidity 0.8.13;
+contract DeresyRequests {
     
     enum QuestionType {Text, Checkbox}
     
@@ -10,7 +10,6 @@ contract DeresyRequestsV2 {
     }
 
     struct Review {
-      string reviewIpfsHash;
       address reviewer;
       uint8 targetIndex;
       string[] answers;
@@ -30,6 +29,9 @@ contract DeresyRequestsV2 {
 
     mapping(string => ReviewRequest) private reviewRequests;
 
+    string[] public reviewRequestNames;
+    uint256 public reviewFormsTotal;
+
     // mapping(string => Review[]) private reviews;
 
     reviewForm[] reviewForms;
@@ -40,6 +42,7 @@ contract DeresyRequestsV2 {
         require(questionTypes.length > 0, "Deresy: Question Types can't be null");
         require(questionTypes.length == questions.length, "Deresy: Needs to be the same quantity of parameters");
         reviewForms.push(reviewForm(questions,questionTypes));
+        reviewFormsTotal += 1;
         return reviewForms.length - 1;
     }
 
@@ -59,28 +62,22 @@ contract DeresyRequestsV2 {
         reviewRequests[_name].isClosed = false;
         reviewRequests[_name].fundsLeft = msg.value;
         reviewRequests[_name].reviewFormIndex = reviewFormIndex;
+        reviewRequestNames.push(_name);
     }
 
-    function submitReview(string memory _name, uint8 targetIndex, string memory reviewIpfsHash, string[] memory answers) external {
-        require(reviewRequests[_name].isClosed == false,"Deresy: request closed");
-        require(targetIndex < reviewRequests[_name].targets.length,"Deresy: targetIndex invalid");
-        require(reviewForms[reviewRequests[_name].reviewFormIndex].questions.length == answers.length,"Deresy: Not the same number of questions and answers");
-        // require(reviewRequests[_name].fundsLeft < reviewRequests[_name].rewardPerReview, "Deresy: Funds are less than reward");
-        // bool flag = false;
-        for (uint i = 0; i < reviewRequests[_name].reviewers.length; i++){
-            if(reviewRequests[_name].reviewers[i] == msg.sender){
-                for (uint j = 0; j < reviewRequests[_name].targets.length; j++){     
-                    if(reviewRequests[_name].reviews[j].reviewer != msg.sender){               
-                        reviewRequests[_name].reviews.push(Review(reviewIpfsHash,msg.sender,targetIndex, answers));
-                        reviewRequests[_name].fundsLeft -= reviewRequests[_name].rewardPerReview;
-                        payable(msg.sender).transfer(reviewRequests[_name].rewardPerReview);
-                    }
-
-                }
-
-            }
+    function submitReview(string memory _name, uint8 targetIndex, string[] memory answers) external {
+      require(reviewRequests[_name].isClosed == false,"Deresy: request closed");
+      require(targetIndex < reviewRequests[_name].targets.length,"Deresy: targetIndex invalid");
+      require(reviewForms[reviewRequests[_name].reviewFormIndex].questions.length == answers.length,"Deresy: Not the same number of questions and answers");
+      // require(reviewRequests[_name].fundsLeft < reviewRequests[_name].rewardPerReview, "Deresy: Funds are less than reward");
+      // bool flag = false;
+      for (uint i = 0; i < reviewRequests[_name].reviewers.length; i++){
+        if(reviewRequests[_name].reviewers[i] == msg.sender){
+          reviewRequests[_name].reviews.push(Review(msg.sender,targetIndex, answers));
+          reviewRequests[_name].fundsLeft -= reviewRequests[_name].rewardPerReview;
+          payable(msg.sender).transfer(reviewRequests[_name].rewardPerReview);
         }
-
+      }
     }
 
     function closeReviewRequest(string memory _name) external{
@@ -93,8 +90,8 @@ contract DeresyRequestsV2 {
         reviewRequests[_name].fundsLeft = 0;
     }
 
-    function getRequest(string memory _name) public view returns (address[] memory reviewers,string[] memory targets,string memory formIpfsHash,uint256 rewardPerReview,Review[] memory review,uint256 reviewFormIndex ){
-        return (reviewRequests[_name].reviewers,reviewRequests[_name].targets,reviewRequests[_name].formIpfsHash,reviewRequests[_name].rewardPerReview, reviewRequests[_name].reviews, reviewRequests[_name].reviewFormIndex);
+    function getRequest(string memory _name) public view returns (address[] memory reviewers,string[] memory targets,string memory formIpfsHash,uint256 rewardPerReview,Review[] memory review,uint256 reviewFormIndex, bool isClosed){
+        return (reviewRequests[_name].reviewers,reviewRequests[_name].targets,reviewRequests[_name].formIpfsHash,reviewRequests[_name].rewardPerReview, reviewRequests[_name].reviews, reviewRequests[_name].reviewFormIndex, reviewRequests[_name].isClosed);
     }
 
     function getReviewForm(uint256 _reviewFormIndex) public view returns(string[] memory, QuestionType[] memory){
