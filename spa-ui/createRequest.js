@@ -214,6 +214,26 @@ const createRequest = async () => {
   function removeElement(element) {
     element.remove();
   };
+
+  const populateReviewFormIndexSelect = async () => {
+    if (account) {
+      try {
+        const contract = new web3.eth.Contract(abi, contractAddress, {
+          from: account,
+        });
+        console.log(contract);
+        const rfTotal = await contract.methods.reviewFormsTotal().call();
+        const formIndexDropdown = document.getElementById("reviewFormIndex");
+        let optionsHTML = ''
+        for (let i = 0; i < rfTotal; i++) {
+          optionsHTML += `<option value="${i}">${i}</option>`;
+        }
+        formIndexDropdown.innerHTML += optionsHTML;
+      } catch (error) {
+        throw error;
+      }
+    }
+  };
   
   var prev_onLoad = window.onload;
 

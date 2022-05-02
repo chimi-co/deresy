@@ -80,6 +80,13 @@
         border-radius: 4px;
         margin-bottom: 1%;
       }
+
+      .button-xlarge {
+        font-size: 125%;
+        width: 30%;
+        padding-top: 2%;
+        padding-bottom: 2%;
+      }
       
       /*--FORM STYLES--*/
       .form-title {
@@ -158,3 +165,9 @@
         font-weight:bolder;
         display: none;
       }
+
+      /*-- CUSTOM STYLES --*/
+      .xl-button-div{
+        text-align: center;
+      }
+      

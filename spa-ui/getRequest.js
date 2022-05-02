@@ -60,6 +60,26 @@ const validateGetRequestFields = (name) => {
   return validName;
 };
 
+const populateReviewRequestNameSelect = async () => {
+  if (account) {
+    try {
+      const contract = new web3.eth.Contract(abi, contractAddress, {
+        from: account,
+      });
+      
+      const rrNames = await contract.methods.getReviewRequestsNames().call();
+      const reviewRequestNameDropdown = document.getElementById("getRequestName");
+      let optionsHTML = ''
+      for (let i = 0; i < rrNames.length; i++) {
+        optionsHTML += `<option value="${rrNames[i]}">${rrNames[i]}</option>`;
+      }
+      reviewRequestNameDropdown.innerHTML += optionsHTML;
+    } catch (error) {
+      throw error;
+    }
+  }
+};
+
 var prev_onLoad = window.onload;
 
 window.onload = async function () {

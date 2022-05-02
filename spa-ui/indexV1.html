@@ -34,10 +34,6 @@
         font-size: 13px;
       }
 
-      textarea {
-        resize: none;
-      }
-
       h1,
       h2,
       h3,
@@ -80,13 +76,6 @@
         border-radius: 4px;
         margin-bottom: 1%;
       }
-
-      .button-warning {
-        background: rgb(223, 117, 20);
-        color: white;
-        border-radius: 4px;
-        margin-bottom: 1%;
-        }
       
       /*--FORM STYLES--*/
       .form-title {
@@ -169,44 +158,6 @@
     <script>
       const abi = [
         {
-          "inputs": [],
-          "name": "reviewFormsTotal",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function",
-          "constant": true
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "string[]",
-              "name": "questions",
-              "type": "string[]"
-            },
-            {
-              "internalType": "enum DeresyRequests.QuestionType[]",
-              "name": "questionTypes",
-              "type": "uint8[]"
-            }
-          ],
-          "name": "createReviewForm",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
           "inputs": [
             {
               "internalType": "string",
@@ -232,11 +183,6 @@
               "internalType": "uint256",
               "name": "rewardPerReview",
               "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "reviewFormIndex",
-              "type": "uint256"
             }
           ],
           "name": "createRequest",
@@ -258,9 +204,9 @@
               "type": "uint8"
             },
             {
-              "internalType": "string[]",
-              "name": "answers",
-              "type": "string[]"
+              "internalType": "string",
+              "name": "reviewIpfsHash",
+              "type": "string"
             }
           ],
           "name": "submitReview",
@@ -314,6 +260,11 @@
             {
               "components": [
                 {
+                  "internalType": "string",
+                  "name": "reviewIpfsHash",
+                  "type": "string"
+                },
+                {
                   "internalType": "address",
                   "name": "reviewer",
                   "type": "address"
@@ -322,21 +273,11 @@
                   "internalType": "uint8",
                   "name": "targetIndex",
                   "type": "uint8"
-                },
-                {
-                  "internalType": "string[]",
-                  "name": "answers",
-                  "type": "string[]"
                 }
               ],
-              "internalType": "struct DeresyRequests.Review[]",
-              "name": "review",
+              "internalType": "struct IpfsDeresyRequests.Review[]",
+              "name": "reviews",
               "type": "tuple[]"
-            },
-            {
-              "internalType": "uint256",
-              "name": "reviewFormIndex",
-              "type": "uint256"
             },
             {
               "internalType": "bool",
@@ -347,53 +288,14 @@
           "stateMutability": "view",
           "type": "function",
           "constant": true
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "_reviewFormIndex",
-              "type": "uint256"
-            }
-          ],
-          "name": "getReviewForm",
-          "outputs": [
-            {
-              "internalType": "string[]",
-              "name": "",
-              "type": "string[]"
-            },
-            {
-              "internalType": "enum DeresyRequests.QuestionType[]",
-              "name": "",
-              "type": "uint8[]"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function",
-          "constant": true
-        },
-        {
-          "inputs": [],
-          "name": "getReviewRequestsNames",
-          "outputs": [
-            {
-              "internalType": "string[]",
-              "name": "",
-              "type": "string[]"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function",
-          "constant": true
         }
       ];
 
       let account;
       let web3;
-      const contractAddress = "0x95ae9d7C5880e684C45925e46Fc49D31bf4eab05";
+      const contractAddress = "0x6dc01D914d846833C47Cd63AD303aaB2c718A325";
 
-      const createReviewForm = async () => {
+      const submitReview = async () => {
         if (account) {
           try {
             const { eth } = web3;
@@ -402,19 +304,19 @@
             });
             const provider = web3.currentProvider.isMetaMask;
               
-            const questions = Array.prototype.slice.call(document.getElementsByName('questions[]'));
-            const questionsValues = questions.map((o) => o.value);
-            const questionTypes = Array.prototype.slice.call(document.getElementsByName('question-types[]'));
-            const questionTypesValues = questionTypes.map((o) => o.value);
+            const _name = document.getElementById("submit-review-name").value;
+            const submitTargetIndex = document.getElementById("submit-review-target").value;
+            const submitHash = document.getElementById("submit-review-hash").value;
             
             
-            const validData = validateCreateReviewForm();
+            const validData = validateSubmitReviewFields(_name, submitTargetIndex, submitHash);
 
             if(validData) {
               const data = await contract.methods
-                .createReviewForm(
-                  questionsValues,
-                  questionTypesValues,
+                .submitReview(
+                  _name,
+                  submitTargetIndex,
+                  submitHash,
                 )
                 .encodeABI();
   
@@ -427,17 +329,17 @@
               await web3.eth
                 .sendTransaction(transaction)
                 .on("transactionHash", (txHash) => {
-                  document.getElementById("create-review-form-info").innerHTML = "In Progress...";
+                  document.getElementById("submit-review-info").innerHTML = "In Progress...";
                 })
                 .on("receipt", function (receipt) {
-                  document.getElementById("create-review-form-info").innerHTML = "Successful...";
+                  document.getElementById("submit-review-info").innerHTML = "Successful...";
                 })
                 .on("error", console.error);
             }
           } catch (error) {
-            document.getElementById("create-review-form-info").innerHTML = "error...";
+            document.getElementById("submit-review-info").innerHTML = "error...";
             if (error.code === 4001) {
-              document.getElementById("create-review-form-info").innerHTML =
+              document.getElementById("submit-review-info").innerHTML =
                 "user rejected transaction...";
             }
             throw error;
@@ -445,100 +347,185 @@
         }
       };
 
-      const validateCreateReviewForm = (name, targetIndex, hash) => {
-        let validQuestions = false;
-        let validQuestionTypes = false;
-        
-        questionFields = document.getElementsByName('questions[]');
+      const validateSubmitReviewFields = (name, targetIndex, hash) => {
+        let validName = false;
+        let validTargetIndex = false;
+        let validHash = false;
 
-        questionFields.forEach(function(question) {
-          var validationMessage = question.parentNode.parentNode.querySelector('.question-validation');
-          if(question.value){
-            validationMessage.style = "display:none";
-            validQuestions = true;
-          } else {
-            validationMessage.innerHTML = "This is a required field";
-            validationMessage.style = "display:block";
-            validQuestions = false;
-          }
-        });
+        var nameValidationMessage = document.getElementById("submit-review-name-validation");
+        var hashValidationMessage = document.getElementById("submit-review-hash-validation");
+        var targetIndexValidationMessage = document.getElementById("submit-review-target-validation");
 
-        questionTypeFields = document.getElementsByName('question-types[]');
+        if(name) {
+          nameValidationMessage.style = "display:none";
+          validName = true;
+        } else {
+          nameValidationMessage.innerHTML = "This is a required field";
+          nameValidationMessage.style = "display:block";
+          validName = false;
+        }
 
-        questionTypeFields.forEach(function(questionType) {
-          var validationMessage = questionType.parentNode.parentNode.querySelector('.question-type-validation');
-          if(questionType.value){
-            validationMessage.style = "display:none";
-            validQuestionTypes = true;
-          } else {
-            validationMessage.innerHTML = "This is a required field";
-            validationMessage.style = "display:block";
-            validQuestionTypes = false;
-          }
-        });
+        if(targetIndex) {
+          targetIndexValidationMessage.style = "display:none";
+          validTargetIndex = true;
+        } else {
+          targetIndexValidationMessage.innerHTML = "This is a required field";
+          targetIndexValidationMessage.style = "display:block";
+          validTargetIndex = false;
+        }
 
-        return validQuestions && validQuestionTypes;
-      };
+        if(hash) {
+          hashValidationMessage.style = "display:none";
+          validHash = true;
+        } else {
+          hashValidationMessage.innerHTML = "This is a required field";
+          hashValidationMessage.style = "display:block";
+          validHash = false;
+        }
 
-      const getReviewForm = async () => {
+        return validName && validTargetIndex && validHash;
+      }
+
+      const createRequest = async () => {
         if (account) {
           try {
-            const reviewFormIndex = document.getElementById("get-review-form-index").value;
-
-            const validData = validateGetReviewFormFields(reviewFormIndex);
+            const { eth } = web3;
+            const contract = new eth.Contract(abi, contractAddress, {
+              from: account,
+            });
+            const provider = web3.currentProvider.isMetaMask;
+              
+            const _name = document.getElementById("requestName").value;
+            const reviewers = Array.prototype.slice.call(document.getElementsByName('reviewers[]'));
+            const reviewersValues = reviewers.map((o) => o.value);
+            const targets = Array.prototype.slice.call(document.getElementsByName('targets[]'));
+            const targetsValues = targets.map((o) => o.value);
+            const formIpfsHash = document.getElementById("ipfsHash").value;
+            const rewardPerReview = document.getElementById("rewardPerReview").value;
+            
+            const validData = validateCreateRequestFields(_name, formIpfsHash, rewardPerReview);
 
             if(validData) {
-              const contract = new web3.eth.Contract(abi, contractAddress, {
-                from: account,
-              });
+              const rewardPerReviewToWei = web3.utils.toWei(rewardPerReview.toString(), "ether");
+              const total = reviewers.length * targets.length * rewardPerReviewToWei;
 
-              try {
-                const reviewForm = await contract.methods.getReviewForm(reviewFormIndex).call();
-                var reviewFormTable = document.getElementById("get-review-form-table");
-                var rfTbody = document.getElementById('rfTbody');
-                rfTbody.innerHTML = '';
-                document.getElementById("get-review-form-info").style = "display: none";
-                reviewFormTable.style = "display: block";
-                reviewForm[0].forEach( (question, index) => {
-                  var rFormTr = document.createElement('tr');
-                  var rFormQuestionTd = document.createElement('td');
-                  var rFormQuestionTypeTd = document.createElement('td');
-                  rFormTr.appendChild(rFormQuestionTd);
-                  rFormTr.appendChild(rFormQuestionTypeTd);
-                  rFormQuestionTd.innerHTML = question;
-                  rFormQuestionTypeTd.innerHTML = reviewForm[1][index] == 0 ? 'Text' : 'Checkbox';
-                  rfTbody.appendChild(rFormTr);
-                });
-              } catch {
-                var reviewFormInfo = document.getElementById("get-review-form-info")
-                reviewFormInfo.innerHTML = "Couldn't find a Review Form with that index"
-                reviewFormInfo.style = "display: block";
-                document.getElementById("get-review-form-table").style = "display: none";
-              }
+              const data = await contract.methods
+                .createRequest(
+                  _name,
+                  reviewersValues,
+                  targetsValues,
+                  formIpfsHash,
+                  rewardPerReviewToWei,
+                )
+                .encodeABI();
+  
+              const transaction = {
+                from: account,
+                to: contractAddress,
+                data,
+                value: total,
+              };
+  
+              await web3.eth
+                .sendTransaction(transaction)
+                .on("transactionHash", (txHash) => {
+                  document.getElementById("msg-transaction").innerHTML = "In Progress...";
+                })
+                .on("receipt", function (receipt) {
+                  document.getElementById("msg-transaction").innerHTML = "Successful...";
+                })
+                .on("error", console.error);
             }
-            
           } catch (error) {
+            document.getElementById("msg-transaction").innerHTML = "Error...";
+            if (error.code === 4001) {
+              document.getElementById("msg-transaction").innerHTML =
+                "user rejected transaction...";
+            }
+            if (error.code === -32603) {
+              document.getElementById("msg-transaction").innerHTML =
+                "caller is not the owner...";
+            }
             throw error;
           }
         }
       };
 
-      const validateGetReviewFormFields = (formIndex) => {
-        let validFormIndex = false;
+      const validateCreateRequestFields = (name, ifpsHash, reward) => {
+        let validName = false;
+        let validReviewers = false;
+        let validTargets = false;
+        let validHash = false;
+        let validReward = false;
 
-        var formIndexValidationMessage = document.getElementById("get-review-form-index-validation");
+        var nameValidationMessage = document.getElementById("name-validation");
+        var hashValidationMessage = document.getElementById("hash-validation");
+        var rewardValidationMessage = document.getElementById("reward-validation");
 
-        if(formIndex) {
-          formIndexValidationMessage.style = "display:none";
-          validFormIndex = true;
+        if(name) {
+          nameValidationMessage.style = "display:none";
+          validName = true;
         } else {
-          formIndexValidationMessage.innerHTML = "This is a required field";
-          formIndexValidationMessage.style = "display:block";
-          validFormIndex = false;
+          nameValidationMessage.innerHTML = "This is a required field";
+          nameValidationMessage.style = "display:block";
+          validName = false;
         }
 
-        return validFormIndex;
-      };
+        if(ifpsHash) {
+          hashValidationMessage.style = "display:none";
+          validHash = true;
+        } else {
+          hashValidationMessage.innerHTML = "This is a required field";
+          hashValidationMessage.style = "display:block";
+          validHash = false;
+        }
+
+        if(reward) {
+          rewardValidationMessage.style = "display:none";
+          validReward = true;
+        } else {
+          rewardValidationMessage.innerHTML = "This is a required field";
+          rewardValidationMessage.style = "display:block";
+          validReward = false;
+        }
+
+        targetFields = document.getElementsByName('targets[]');
+
+        targetFields.forEach(function(target) {
+          var validationMessage = target.parentNode.parentNode.querySelector('.validation-error');
+          if(target.value){
+            validationMessage.style = "display:none";
+            validTargets = true;
+          } else {
+            validationMessage.innerHTML = "This is a required field";
+            validationMessage.style = "display:block";
+            validTargets = false;
+          }
+        });
+
+        reviewerFields = document.getElementsByName('reviewers[]');
+
+        reviewerFields.forEach(function(reviewer) {
+          var validationMessage = reviewer.parentNode.parentNode.querySelector('.validation-error');
+          if(reviewer.value){
+            var re = /^0x[a-fA-F0-9]{40}$/g;
+            if(re.test(reviewer.value)) {
+              validationMessage.style = "display:none";
+              validReviewers = true;
+            } else {
+              validationMessage.innerHTML = "This is not a valid ETH address";
+              validationMessage.style = "display:block";
+              validReviewers = false;
+            }
+          } else {
+            validationMessage.innerHTML = "This is a required field";
+            validationMessage.style = "display:block";
+            validReviewers = false;
+          }
+        });
+
+        return validName && validHash && validReward && validTargets && validReviewers;
+      }
 
       const getRequest = async () => {
         if (account) {
@@ -560,16 +547,10 @@
                 document.getElementById("requestIpfsHashTd").innerHTML = request.formIpfsHash;
                 document.getElementById("requestRewardTd").innerHTML = `${request.rewardPerReview/1000000000000000000} ETH`;
                 document.getElementById("requestClosedTd").innerHTML = request.isClosed;
-                let reviewsText = "";
-                console.log(request)
-                if(request.review) {
-                  request.review.forEach(review => {
-                    reviewsText += `<strong>Reviewer:</strong> ${review.reviewer}<br><strong>Target Index:</strong> ${review.targetIndex}<br><strong><br>`
-                    review.answers.forEach((answer, index) =>{
-                      reviewsText += `<strong>Question ${index + 1}</strong><br>${answer}<br>`
-                    })
-                  })
-                }
+                let reviewsText = ""
+                request.reviews.forEach(review => {
+                  reviewsText += `<strong>Reviewer:</strong> ${review.reviewer}<br><strong>Target Index:</strong> ${review.targetIndex}<br><strong>IPFS Hash:</strong> ${review.reviewIpfsHash}<br><br>`
+                })
                 document.getElementById("requestReviewsTd").innerHTML = reviewsText;
               } else {
                 var requestInfo = document.getElementById("request-info")
@@ -664,254 +645,7 @@
         }
 
         return validName;
-      };
-
-      const createRequest = async () => {
-        if (account) {
-          try {
-            const { eth } = web3;
-            const contract = new eth.Contract(abi, contractAddress, {
-              from: account,
-            });
-            const provider = web3.currentProvider.isMetaMask;
-              
-            const _name = document.getElementById("requestName").value;
-            const reviewers = Array.prototype.slice.call(document.getElementsByName('reviewers[]'));
-            const reviewersValues = reviewers.map((o) => o.value);
-            const targets = Array.prototype.slice.call(document.getElementsByName('targets[]'));
-            const targetsValues = targets.map((o) => o.value);
-            const reviewFormIndex = document.getElementById("reviewFormIndex").value;
-            const formIpfsHash = document.getElementById("ipfsHash").value;
-            const rewardPerReview = document.getElementById("rewardPerReview").value;
-            
-            const validData = validateCreateRequestFields(_name, reviewFormIndex, rewardPerReview);
-
-            if(validData) {
-              const rewardPerReviewToWei = web3.utils.toWei(rewardPerReview.toString(), "ether");
-              const total = reviewers.length * targets.length * rewardPerReviewToWei;
-
-              const data = await contract.methods
-                .createRequest(
-                  _name,
-                  reviewersValues,
-                  targetsValues,
-                  formIpfsHash,
-                  rewardPerReviewToWei,
-                  reviewFormIndex,
-                )
-                .encodeABI();
-  
-              const transaction = {
-                from: account,
-                to: contractAddress,
-                data,
-                value: total,
-              };
-  
-              await web3.eth
-                .sendTransaction(transaction)
-                .on("transactionHash", (txHash) => {
-                  document.getElementById("msg-transaction").innerHTML = "In Progress...";
-                })
-                .on("receipt", function (receipt) {
-                  document.getElementById("msg-transaction").innerHTML = "Successful...";
-                })
-                .on("error", console.error);
-            }
-          } catch (error) {
-            document.getElementById("msg-transaction").innerHTML = "Error...";
-            if (error.code === 4001) {
-              document.getElementById("msg-transaction").innerHTML =
-                "user rejected transaction...";
-            }
-            if (error.code === -32603) {
-              document.getElementById("msg-transaction").innerHTML =
-                "caller is not the owner...";
-            }
-            throw error;
-          }
-        }
-      };
-
-      const validateCreateRequestFields = (name, reviewFormIndex, reward) => {
-        let validName = false;
-        let validReviewers = false;
-        let validTargets = false;
-        let validReviewFormIndex = false;
-        let validReward = false;
-
-        var nameValidationMessage = document.getElementById("name-validation");
-        var reviewFormIndexValidationMessage = document.getElementById("review-form-index-validation");
-        var rewardValidationMessage = document.getElementById("reward-validation");
-
-        if(name) {
-          nameValidationMessage.style = "display:none";
-          validName = true;
-        } else {
-          nameValidationMessage.innerHTML = "This is a required field";
-          nameValidationMessage.style = "display:block";
-          validName = false;
-        }
-
-        if(reviewFormIndex) {
-          reviewFormIndexValidationMessage.style = "display:none";
-          validReviewFormIndex = true;
-        } else {
-          reviewFormIndexValidationMessage.innerHTML = "This is a required field";
-          reviewFormIndexValidationMessage.style = "display:block";
-          validReviewFormIndex = false;
-        }
-
-        if(reward) {
-          rewardValidationMessage.style = "display:none";
-          validReward = true;
-        } else {
-          rewardValidationMessage.innerHTML = "This is a required field";
-          rewardValidationMessage.style = "display:block";
-          validReward = false;
-        }
-
-        targetFields = document.getElementsByName('targets[]');
-
-        targetFields.forEach(function(target) {
-          var validationMessage = target.parentNode.parentNode.querySelector('.validation-error');
-          if(target.value){
-            validationMessage.style = "display:none";
-            validTargets = true;
-          } else {
-            validationMessage.innerHTML = "This is a required field";
-            validationMessage.style = "display:block";
-            validTargets = false;
-          }
-        });
-
-        reviewerFields = document.getElementsByName('reviewers[]');
-
-        reviewerFields.forEach(function(reviewer) {
-          var validationMessage = reviewer.parentNode.parentNode.querySelector('.validation-error');
-          if(reviewer.value){
-            var re = /^0x[a-fA-F0-9]{40}$/g;
-            if(re.test(reviewer.value)) {
-              validationMessage.style = "display:none";
-              validReviewers = true;
-            } else {
-              validationMessage.innerHTML = "This is not a valid ETH address";
-              validationMessage.style = "display:block";
-              validReviewers = false;
-            }
-          } else {
-            validationMessage.innerHTML = "This is a required field";
-            validationMessage.style = "display:block";
-            validReviewers = false;
-          }
-        });
-
-        return validName && validReviewFormIndex && validReward && validTargets && validReviewers;
-      }
-
-      const submitReview = async () => {
-        if (account) {
-          try {
-            const { eth } = web3;
-            const contract = new eth.Contract(abi, contractAddress, {
-              from: account,
-            });
-            const provider = web3.currentProvider.isMetaMask;
-              
-            const _name = document.getElementById("submit-review-name").value;
-            const submitTargetIndex = document.getElementById("submit-review-target-index").value;
-            const answersValues = [];
-            const answers = document.getElementsByClassName('submit-review-answers');
-            for(let answer of answers) {
-              if(answer.type == "text") {
-                answersValues.push(answer.value);
-              } else if (answer.type == "radio") {
-                if(answer.checked) {
-                  answersValues.push(answer.value);
-                }
-              } 
-            };
-            console.log('answersValues', answersValues)
-            
-            const validData = validateSubmitReviewFields(_name, submitTargetIndex);
-
-            if(validData) {
-              const data = await contract.methods
-                .submitReview(
-                  _name,
-                  submitTargetIndex,
-                  answersValues,
-                )
-                .encodeABI();
-  
-              const transaction = {
-                from: account,
-                to: contractAddress,
-                data,
-              };
-  
-              await web3.eth
-                .sendTransaction(transaction)
-                .on("transactionHash", (txHash) => {
-                  document.getElementById("submit-review-info").innerHTML = "In Progress...";
-                })
-                .on("receipt", function (receipt) {
-                  document.getElementById("submit-review-info").innerHTML = "Successful...";
-                })
-                .on("error", console.error);
-            }
-          } catch (error) {
-            document.getElementById("submit-review-info").innerHTML = "error...";
-            if (error.code === 4001) {
-              document.getElementById("submit-review-info").innerHTML =
-                "user rejected transaction...";
-            }
-            throw error;
-          }
-        }
-      };
-
-      const validateSubmitReviewFields = (name, targetIndex) => {
-        let validName = false;
-        let validTargetIndex = false;
-        let validAnswers = false;
-
-        var nameValidationMessage = document.getElementById("submit-review-name-validation");
-        var targetIndexValidationMessage = document.getElementById("submit-review-target-index-validation");
-
-        if(name) {
-          nameValidationMessage.style = "display:none";
-          validName = true;
-        } else {
-          nameValidationMessage.innerHTML = "This is a required field";
-          nameValidationMessage.style = "display:block";
-          validName = false;
-        }
-
-        if(targetIndex) {
-          targetIndexValidationMessage.style = "display:none";
-          validTargetIndex = true;
-        } else {
-          targetIndexValidationMessage.innerHTML = "This is a required field";
-          targetIndexValidationMessage.style = "display:block";
-          validTargetIndex = false;
-        }
-
-        answers = document.getElementsByClassName('submit-review-answers');
-        for(let answer of answers) {
-          var validationMessage = answer.type == "text" ? answer.parentNode.parentNode.querySelector('.validation-error') : answer.parentNode.parentNode.parentNode.querySelector('.validation-error');
-          if(answer.value){
-            validationMessage.style = "display:none";
-            validAnswers = true;
-          } else {
-            validationMessage.innerHTML = "This is a required field";
-            validationMessage.style = "display:block";
-            validAnswers = false;
-          }
-        };
-
-        return validName && validTargetIndex && validAnswers;
-      }
+      }      
 
       const handleAccountsChanged = (accounts) => {
         if (accounts.length === 0) {
@@ -927,8 +661,6 @@
               "enableMM"
             ).innerHTML = `<small>Current account: ${account}</small>`;
             document.getElementById("connectBtn").style = "display: none";
-            populateReviewFormIndexSelect();
-            //populateReviewRequestNameSelect();
           } else {
             document.getElementById(
               "enableMM"
@@ -956,104 +688,6 @@
 
       const detectMetaMask = () => typeof window.ethereum !== "undefined";
 
-      const addQuestion = () => {
-        var pureG = document.createElement('div');
-        pureG.className = "pure-g";
-        
-        var pureQuestionFieldLabel = document.createElement('div');
-        pureQuestionFieldLabel.className = "pure-u-5-12";
-        var pureQuestionFieldLabelSeparator1 = document.createElement('div');
-        pureQuestionFieldLabelSeparator1.className = "pure-u-1-24";
-        var pureQuestionTypeFieldLabel = document.createElement('div');
-        pureQuestionTypeFieldLabel.className = "pure-u-1-3";
-        var pureQuestionFieldLabelSeparator2 = document.createElement('div');
-        pureQuestionFieldLabelSeparator2.className = "pure-u-1-6";
-        
-        var pureQuestionField = document.createElement('div');
-        pureQuestionField.className = "pure-u-5-12";
-        var pureSeparator = document.createElement('div');
-        pureSeparator.className = "pure-u-1-24";
-        var pureQuestionTypeField = document.createElement('div');
-        pureQuestionTypeField.className = "pure-u-1-3";
-        var pureSeparator2 = document.createElement('div');
-        pureSeparator2.className = "pure-u-1-24";
-        var pureRemove = document.createElement('div');
-        pureRemove.className = "pure-u-1-8";
-
-        var pureQuestionFieldValidation = document.createElement('div');
-        pureQuestionFieldValidation.className = "pure-u-5-12";
-        var pureQuestionFieldValidationSeparator1 = document.createElement('div');
-        pureQuestionFieldValidationSeparator1.className = "pure-u-1-24";
-        var pureQuestionTypeFieldValidation = document.createElement('div');
-        pureQuestionTypeFieldValidation.className = "pure-u-1-3";
-        var pureQuestionFieldValidationSeparator2 = document.createElement('div');
-        pureQuestionFieldValidationSeparator2.className = "pure-u-1-6";
-
-        pureG.appendChild(pureQuestionFieldLabel);
-        pureG.appendChild(pureQuestionFieldLabelSeparator1);
-        pureG.appendChild(pureQuestionTypeFieldLabel);
-        pureG.appendChild(pureQuestionFieldLabelSeparator2);
-        pureG.appendChild(pureQuestionField);
-        pureG.appendChild(pureSeparator);
-        pureG.appendChild(pureQuestionTypeField);
-        pureG.appendChild(pureSeparator2);
-        pureG.appendChild(pureRemove);
-        pureG.appendChild(pureQuestionFieldValidation);
-        pureG.appendChild(pureQuestionFieldValidationSeparator1);
-        pureG.appendChild(pureQuestionTypeFieldValidation);
-        pureG.appendChild(pureQuestionFieldValidationSeparator2);
-
-        var questionLabel = document.createElement('label')
-        questionLabel.innerHTML = "Question"
-        var questionInput = document.createElement('input')
-        questionInput.className = "pure-input-1"
-        questionInput.type = "text"
-        questionInput.placeholder="Enter a question"
-        questionInput.name="questions[]"
-        pureQuestionFieldLabel.appendChild(questionLabel)
-        pureQuestionField.appendChild(questionInput)
-
-
-        var questionTypeLabel = document.createElement('label')
-        questionTypeLabel.innerHTML = "Question Type"
-        var questionTypeSelect = document.createElement('select')
-        questionTypeSelect.className = "pure-input-1"
-        questionTypeSelect.name = "question-types[]"
-        var selectPlaceholder = document.createElement('option')
-        selectPlaceholder.innerHTML = "Select a question type"
-        selectPlaceholder.hidden = true
-        selectPlaceholder.selected = true
-        selectPlaceholder.value = ""
-        var selectOpt1 = document.createElement('option')
-        selectOpt1.innerHTML = "Text"
-        selectOpt1.value = "0"
-        var selectOpt2 = document.createElement('option')
-        selectOpt2.innerHTML = "Checkbox"
-        selectOpt2.value = "1"
-        questionTypeSelect.appendChild(selectPlaceholder)
-        questionTypeSelect.appendChild(selectOpt1)
-        questionTypeSelect.appendChild(selectOpt2)
-        pureQuestionTypeFieldLabel.appendChild(questionTypeLabel)
-        pureQuestionTypeField.appendChild(questionTypeSelect)
-
-        var questionRemove = document.createElement('button');
-        questionRemove.className = "button-error pure-button"
-        questionRemove.onclick = function() { pureG.remove() };
-        questionRemove.type = "button";
-        questionRemove.innerHTML = "X";
-        pureRemove.appendChild(questionRemove);
-
-        var questionValidationMessage = document.createElement('small');
-        questionValidationMessage.className = "validation-error question-validation";
-        pureQuestionFieldValidation.appendChild(questionValidationMessage);
-
-        var questionTypeValidationMessage = document.createElement('small');
-        questionTypeValidationMessage.className = "validation-error question-type-validation";
-        pureQuestionTypeFieldValidation.appendChild(questionTypeValidationMessage);
-        
-        document.getElementById("questionWrapper").appendChild(pureG);
-      };
-      
       const addTargetInput = () => {
         var pureG = document.createElement('div');
         pureG.className = "pure-g";
@@ -1126,114 +760,6 @@
       
       function removeElement(element) {
         element.remove();
-      };
-
-      async function getRequestQuestions() {
-        if (account) {
-          try {
-            const reviewName = document.getElementById("submit-review-name").value;
-
-            const validData = validateGetRequestQuestions(reviewName);
-
-            if(validData) {
-              const contract = new web3.eth.Contract(abi, contractAddress, {
-                from: account,
-              });
-              const reviewRequest = await contract.methods.getRequest(reviewName).call();
-              const requestTargets = reviewRequest.targets;
-              const reviewFormIndex = reviewRequest.reviewFormIndex;
-              const reviewForm = await contract.methods.getReviewForm(reviewFormIndex).call();
-              const questions = reviewForm[0]
-              const questionTypes = reviewForm[1]
-
-              let questionsHTML = `<label>Target</label><div class="pure-g"><div class="pure-u-20-24"><select id="submit-review-target-index" class="pure-input-1"><option hidden selected value="">Select the target for your review</option><select/></div><div class="pure-u-20-24"><small id="submit-review-target-index-validation" class="validation-error"></small></div></div>`
-
-              questionTypes.forEach( (questionType,index) => {
-                questionsHTML += questionType == 0 ?  createTextQuestion(questions[index]) : createCheckboxQuestion(questions[index], index);
-              });
-              document.getElementById("submit-review-questions-wrapper").innerHTML = questionsHTML;
-              document.getElementById("submit-review-questions-wrapper").style = "display:block";
-
-              const targetIndexSelect = document.getElementById('submit-review-target-index');
-              for (let i = 0; i < requestTargets.length; i++) {
-                targetIndexSelect.innerHTML += `<option value="${i}">${requestTargets[i]}</option>`;
-              }
-            }
-          } catch (error) {
-            throw error;
-          }
-        }
-      };
-
-      const validateGetRequestQuestions = (name) => {
-        let validName = false;
-
-        var nameValidationMessage = document.getElementById("submit-review-name-validation");
-
-        if(name) {
-          nameValidationMessage.style = "display:none";
-          validName = true;
-        } else {
-          nameValidationMessage.innerHTML = "This is a required field";
-          nameValidationMessage.style = "display:block";
-          validName = false;
-        }
-
-        return validName;
-      };
-
-      function createTextQuestion(question) {
-        let questionHTML = `<label>${question}</label><div class="pure-g"><div class="pure-u-20-24"><textarea class="submit-review-answers" class="pure-input-1" placeholder="Enter your answer" rows="4" cols="90"></textarea></div><div class="pure-u-20-24"><small class="validation-error"></small></div></div><br/>`;  
-        return questionHTML;
-      };
-
-      function createCheckboxQuestion(question, index) {
-        let questionHTML = `<label>${question}</label><div class="pure-g"><div class="pure-u-10-24"><label for="radio-1-${index}" class="pure-checkbox""><input type="radio" class="submit-review-answers" name="checkbox-answers-${index}" id="radio-1-${index}" value="Yes" style="width:20px !important" checked />Yes</label></div><div class="pure-u-10-24"><label for="radio-2-${index}" class="pure-checkbox"><input type="radio" name="checkbox-answers-${index}" class="submit-review-answers" id="radio-2-${index}" value="No" style="width:20px !important"/>No</label></div><div class="pure-u-20-24"><small class="validation-error"></small></div></div><br/>`;
-        return questionHTML;
-      };
-
-      const populateReviewFormIndexSelect = async () => {
-        if (account) {
-          try {
-            const contract = new web3.eth.Contract(abi, contractAddress, {
-              from: account,
-            });
-            console.log(contract);
-            const rfTotal = await contract.methods.reviewFormsTotal().call();
-            const formIndexDropdown = document.getElementById("get-review-form-index");
-            let optionsHTML = ''
-            for (let i = 0; i < rfTotal; i++) {
-              optionsHTML += `<option value="${i}">${i}</option>`;
-            }
-            formIndexDropdown.innerHTML += optionsHTML;
-          } catch (error) {
-            throw error;
-          }
-        }
-      };
-
-      const populateReviewRequestNameSelect = async () => {
-        if (account) {
-          try {
-            const contract = new web3.eth.Contract(abi, contractAddress, {
-              from: account,
-            });
-            
-            const rrNames = await contract.methods.reviewRequestNames().call();
-            const reviewRequestNameDropdown = document.getElementById("submit-review-name");
-            let optionsHTML = ''
-            for (let i = 0; i < rrNames; i++) {
-              optionsHTML += `<option value="${rrNames[i]}">${rrNames[i]}</option>`;
-            }
-            reviewRequestNameDropdown.innerHTML += optionsHTML;
-          } catch (error) {
-            throw error;
-          }
-        }
-      };
-
-      const resetSubmitQuestions = () => {
-        document.getElementById("submit-review-questions-wrapper").style = "display:none"
       }
 
       window.onload = async function () {
@@ -1251,15 +777,6 @@
         }
         
         document.getElementById("connectBtn").addEventListener("click", connect);
-
-        document
-          .getElementById("createReviewFormBtn")
-          .addEventListener("click", createReviewForm);
-
-        document
-          .getElementById("getReviewFormBtn")
-          .addEventListener("click", getReviewForm);
-
         document
           .getElementById("createRequestBtn")
           .addEventListener("click", createRequest);
@@ -1278,9 +795,6 @@
 
         document.getElementById("addTargetsBtn").addEventListener("click", addTargetInput);
         document.getElementById("addReviewersBtn").addEventListener("click", addReviewerInput);
-        document.getElementById("addQuestionBtn").addEventListener("click", addQuestion);
-        document.getElementById("getRequestQuestionsBtn").addEventListener("click", getRequestQuestions);
-        document.getElementById("submit-review-name").addEventListener("onchange", resetSubmitQuestions);
       };
     </script>
 
@@ -1304,266 +818,183 @@
         <div class="pure-u-1 l-box">
           <form class="pure-form pure-form-stacked">
             <fieldset>
-              <legend class="form-title">Create Review Form</legend>
-              <div id="questionWrapper">
+              <legend class="form-title">Create Request</legend>
+              <label>Name</label>
+              <div>
                 <div class="pure-g">
-                  <div class="pure-u-5-12">
-                    <label>Question</label>
+                  <div class="pure-u-20-24">
+                    <input id="requestName" type="text" name="requestName" placeholder="Enter a name for the request" class="pure-input-1"/>
                   </div>
-                  <div class="pure-u-1-24"></div>
-                  <div class="pure-u-1-3">
-                    <label>Question Type</label>
+                </div>
+                <div class="pure-g">
+                  <div class="pure-u-20-24">
+                    <small id="name-validation" class="validation-error"></small>
                   </div>
-                  <div class="pure-u-1-6"></div>
-                  <div class="pure-u-5-12">
-                    <input class="pure-input-1" type="text" placeholder="Enter a question" name="questions[]"/>
-                  </div>
-                  <div class="pure-u-1-24"></div>
-                  <div class="pure-u-1-3">
-                    <select name="question-types[]" class="pure-input-1">
-                      <option hidden selected value="">Select a question type</option>
-                      <option value="0">Text</option>
-                      <option value="1">Checkbox</option>
-                    </select>
-                  </div>
-                  <div class="pure-u-1-6"></div>
-                  <div class="pure-u-5-12">
-                    <small class="validation-error question-validation"></small>
-                  </div>
-                  <div class="pure-u-1-24"></div>
-                  <div class="pure-u-1-3">
-                    <small class="validation-error question-type-validation"></small>
-                  </div>
-                  <div class="pure-u-1-6"></div>
                 </div>
               </div>
-              <div class="pure-u-1">
-                <button class="pure-button button-success" style="margin-top: 15px" id="addQuestionBtn" type="button">Add Question</button>
+              <label>Reviewers</label>
+              <div id="reviewerWrapper">
+                <div class="pure-g">
+                  <div class="pure-u-20-24">
+                    <input class="pure-input-1" type="text" placeholder="Enter a reviewer" name="reviewers[]"/>
+                  </div>
+                  <div class="pure-u-1-6"></div>
+                  <div class="pure-u-20-24">
+                    <small class="validation-error"></small>
+                  </div>
+                </div>
               </div>
-              <div class="pure-u-1">
-                <button id="createReviewFormBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
+              <button class="pure-button button-success" style="margin-top: 15px" id="addReviewersBtn" type="button">Add Reviewer</button>
+              <label>Targets</label>
+              <div id="targetWrapper">
+                <div class="pure-g">
+                  <div class="pure-u-20-24">
+                    <input class="pure-input-1" type="text" placeholder="Enter a target" name="targets[]"/>
+                  </div>
+                  <div class="pure-u-1-6"></div>
+                  <div class="pure-u-20-24">
+                    <small class="validation-error"></small>
+                  </div>
+                </div>
               </div>
+              <button class="pure-button button-success" style="margin-top: 15px" id="addTargetsBtn" type="button">Add Target</button>
+              <label>IPFS Hash</label>
+              <div class="pure-g">
+                <div class="pure-u-20-24">
+                  <input id="ipfsHash" type="text" name="ipfsHash" placeholder="Enter the IPFS Hash" class="pure-input-1"/>
+                </div>
+              </div>
+              <div class="pure-g">
+                <div class="pure-u-20-24">
+                  <small id="hash-validation" class="validation-error"></small>
+                </div>
+              </div>
+              <label>Reward per Review</label>
+              <div class="pure-g">
+                <div class="pure-u-20-24">
+                  <input id="rewardPerReview" type="number" step="any" name="rewardPerReview" placeholder="Enter the reward per review" class="pure-input-1"/>
+                </div>
+              </div>
+              <div class="pure-g">
+                <div class="pure-u-20-24">
+                  <small id="reward-validation" class="validation-error"></small>
+                </div>
+              </div>
+              <button id="createRequestBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
             </fieldset>
           </form>
         </div>
         <div class="pure-u-1 l-box">
-          <div id="create-review-form-info"></div>
+          <div id="msg-transaction"></div>
         </div>
         <div class="pure-u-1 l-box">
           <form class="pure-form pure-form-stacked">
             <fieldset>
-              <legend class="form-title">Get Review Form</legend>
-              <div id="questionWrapper">
-                <div class="pure-g">
-                  <div class="pure-u-1">
-                    <label>Review Form Index</label>
-                  </div>
-                  <div class="pure-u-1">
-                    <select id="get-review-form-index" class="pure-input-1">
-                      <option hidden selected value="">Select a Review Form index</option>
-                    </select>
-                  </div>
-                  <div class="pure-u-1">
-                    <small class="validation-error" id="get-review-form-index-validation"></small>
-                  </div>
+              <legend class="form-title">Get Request</legend>
+              <label>Review Request Name</label>
+              <div class="pure-g">
+                <div class="pure-u-20-24">
+                  <input id="getRequestName" type="text" class="pure-input-1" placeholder="Enter the request name" />
+                </div>
+                <div class="pure-u-20-24">
+                  <small id="get-request-name-validation" class="validation-error"></small>
                 </div>
               </div>
-              <div class="pure-u-1">
-                <button id="getReviewFormBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
-              </div>
+              <button id="getRequestBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
             </fieldset>
           </form>
-        </div>
-        <div class="pure-u-1 l-box">
-          <div id="get-review-form-info"></div>
-          <div id="get-review-form-table" style="display:none">
-            <table class="pure-table pure-table-bordered">
-              <thead>
-                <tr>
-                  <th>Question</th>
-                  <th>Question Type</th>
-                </tr>
-              </thead>
-              <tbody id="rfTbody">
-              </tbody>
-            </table>
+          <div class="pure-u-1 l-box">
+            <div id="request-info" style="display:none"></div>
+            <div id="request-table" style="display:none">
+              <table class="pure-table">
+                <tbody>
+                  <tr class="pure-table-odd">
+                    <td>Reviewers</td>
+                    <td id="requestReviewersTd"></td>
+                  </tr>
+                  <tr>
+                    <td>Targets</td>
+                    <td id="requestTargetsTd"></td>
+                  </tr>
+                  <tr class="pure-table-odd">
+                    <td>IPFS Hash</td>
+                    <td id="requestIpfsHashTd"></td>
+                  </tr>
+                  <tr>
+                    <td>Reward per review</td>
+                    <td id="requestRewardTd"></td>
+                  </tr>
+                  <tr class="pure-table-odd">
+                    <td>Is closed?</td>
+                    <td id="requestClosedTd"></td>
+                  </tr>
+                  <tr>
+                    <td>Reviews</td>
+                    <td id="requestReviewsTd"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="pure-u-1 l-box">
-        <form class="pure-form pure-form-stacked">
-          <fieldset>
-            <legend class="form-title">Create Request</legend>
-            <label>Name</label>
-            <div>
-              <div class="pure-g">
-                <div class="pure-u-20-24">
-                  <input id="requestName" type="text" name="requestName" placeholder="Enter a name for the request" class="pure-input-1"/>
-                </div>
-              </div>
-              <div class="pure-g">
-                <div class="pure-u-20-24">
-                  <small id="name-validation" class="validation-error"></small>
-                </div>
-              </div>
-            </div>
-            <label>Review Form Index</label>
-            <div class="pure-g">
-              <div class="pure-u-20-24">
-                <input id="reviewFormIndex" type="number" step="1" name="rewardPerReview" placeholder="Enter the Review Form Index" class="pure-input-1"/>
-              </div>
-            </div>
-            <div class="pure-g">
-              <div class="pure-u-20-24">
-                <small id="review-form-index-validation" class="validation-error"></small>
-              </div>
-            </div>
-            <label>Reviewers</label>
-            <div id="reviewerWrapper">
-              <div class="pure-g">
-                <div class="pure-u-20-24">
-                  <input class="pure-input-1" type="text" placeholder="Enter a reviewer" name="reviewers[]"/>
-                </div>
-                <div class="pure-u-1-6"></div>
-                <div class="pure-u-20-24">
-                  <small class="validation-error"></small>
-                </div>
-              </div>
-            </div>
-            <button class="pure-button button-success" style="margin-top: 15px" id="addReviewersBtn" type="button">Add Reviewer</button>
-            <label>Targets</label>
-            <div id="targetWrapper">
-              <div class="pure-g">
-                <div class="pure-u-20-24">
-                  <input class="pure-input-1" type="text" placeholder="Enter a target" name="targets[]"/>
-                </div>
-                <div class="pure-u-1-6"></div>
-                <div class="pure-u-20-24">
-                  <small class="validation-error"></small>
-                </div>
-              </div>
-            </div>
-            <button class="pure-button button-success" style="margin-top: 15px" id="addTargetsBtn" type="button">Add Target</button>
-            <label>IPFS Hash</label>
-            <div class="pure-g">
-              <div class="pure-u-20-24">
-                <input id="ipfsHash" type="text" name="ipfsHash" placeholder="Enter the IPFS Hash" class="pure-input-1"/>
-              </div>
-            </div>
-            <label>Reward per Review</label>
-            <div class="pure-g">
-              <div class="pure-u-20-24">
-                <input id="rewardPerReview" type="number" step="any" name="rewardPerReview" placeholder="Enter the reward per review" class="pure-input-1"/>
-              </div>
-            </div>
-            <div class="pure-g">
-              <div class="pure-u-20-24">
-                <small id="reward-validation" class="validation-error"></small>
-              </div>
-            </div>
-            <button id="createRequestBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
-          </fieldset>
-        </form>
-      </div>
-      <div class="pure-u-1 l-box">
-        <div id="msg-transaction"></div>
-      </div>
-      <div class="pure-u-1 l-box">
-        <form class="pure-form pure-form-stacked">
-          <fieldset>
-            <legend class="form-title">Get Review Request</legend>
-            <label>Review Request Name</label>
-            <div class="pure-g">
-              <div class="pure-u-20-24">
-                <input id="getRequestName" type="text" class="pure-input-1" placeholder="Enter the request name" />
-              </div>
-              <div class="pure-u-20-24">
-                <small id="get-request-name-validation" class="validation-error"></small>
-              </div>
-            </div>
-            <button id="getRequestBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
-          </fieldset>
-        </form>
         <div class="pure-u-1 l-box">
-          <div id="request-info" style="display:none"></div>
-          <div id="request-table" style="display:none">
-            <table class="pure-table">
-              <tbody>
-                <tr class="pure-table-odd">
-                  <td>Reviewers</td>
-                  <td id="requestReviewersTd"></td>
-                </tr>
-                <tr>
-                  <td>Targets</td>
-                  <td id="requestTargetsTd"></td>
-                </tr>
-                <tr class="pure-table-odd">
-                  <td>IPFS Hash</td>
-                  <td id="requestIpfsHashTd"></td>
-                </tr>
-                <tr>
-                  <td>Reward per review</td>
-                  <td id="requestRewardTd"></td>
-                </tr>
-                <tr class="pure-table-odd">
-                  <td>Is closed?</td>
-                  <td id="requestClosedTd"></td>
-                </tr>
-                <tr>
-                  <td>Reviews</td>
-                  <td id="requestReviewsTd"></td>
-                </tr>
-              </tbody>
-            </table>
+          <form class="pure-form pure-form-stacked">
+            <fieldset>
+              <legend class="form-title">Close Request</legend>
+              <label>Review Request Name</label>
+              <div class="pure-g">
+                <div class="pure-u-20-24">
+                  <input id="closeRequestName" type="text" class="pure-input-1" placeholder="Enter the request name" />
+                </div>
+                <div class="pure-u-20-24">
+                  <small id="close-request-name-validation" class="validation-error"></small>
+                </div>
+              </div>
+              <button id="closeRequestBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
+            </fieldset>
+          </form>
+          <div class="pure-u-1 l-box">
+            <div id="close-request-info"></div>
           </div>
         </div>
-      </div>
-      <div class="pure-u-1 l-box">
-        <form class="pure-form pure-form-stacked">
-          <fieldset>
-            <legend class="form-title">Close Review Request</legend>
-            <label>Review Request Name</label>
-            <div class="pure-g">
-              <div class="pure-u-20-24">
-                <input id="closeRequestName" type="text" class="pure-input-1" placeholder="Enter the request name" />
-              </div>
-              <div class="pure-u-20-24">
-                <small id="close-request-name-validation" class="validation-error"></small>
-              </div>
-            </div>
-            <button id="closeRequestBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
-          </fieldset>
-        </form>
         <div class="pure-u-1 l-box">
-          <div id="close-request-info"></div>
-        </div>
-      </div>
-      <div class="pure-u-1 l-box">
-        <form class="pure-form pure-form-stacked">
-          <fieldset>
-            <legend class="form-title">Submit Review</legend>
-            <label>Review Request Name</label>
-            <div class="pure-g">
-              <div class="pure-u-14-24">
-                <select class="pure-input-1" id="submit-review-name" onchange="resetSubmitQuestions()">
-                  <option selected hidden value="">Select the review request name</option>
-                  <option value="Limits1">Limits1</option>
-                </select>
+          <form class="pure-form pure-form-stacked">
+            <fieldset>
+              <legend class="form-title">Submit Review</legend>
+              <label>Review Request Name</label>
+              <div class="pure-g">
+                <div class="pure-u-20-24">
+                  <input id="submit-review-name" type="text" class="pure-input-1" placeholder="Enter the request name" />
+                </div>
+                <div class="pure-u-20-24">
+                  <small id="submit-review-name-validation" class="validation-error"></small>
+                </div>
               </div>
-              <div class="pure-u-1-24"></div>
-              <div class="pure-u-3-24">
-                <button type="button" style="margin-top:5px" class="pure-button button-warning" id="getRequestQuestionsBtn">Get Request Questions</button>
+              <label>Target Index</label>
+              <div class="pure-g">
+                <div class="pure-u-20-24">
+                  <input id="submit-review-target" type="number" step="1" class="pure-input-1" placeholder="Enter the target index" />
+                </div>
+                <div class="pure-u-20-24">
+                  <small id="submit-review-target-validation" class="validation-error"></small>
+                </div>
               </div>
-              <div class="pure-u-20-24">
-                <small id="submit-review-name-validation" class="validation-error"></small>
+              <label>Review IPFS Hash</label>
+              <div class="pure-g">
+                <div class="pure-u-20-24">
+                  <input id="submit-review-hash" type="text" class="pure-input-1" placeholder="Enter the request name" />
+                </div>
+                <div class="pure-u-20-24">
+                  <small id="submit-review-hash-validation" class="validation-error"></small>
+                </div>
               </div>
+              <button id="submitReviewBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
+            </fieldset>
+          </form>
+          <div class="pure-u-1 l-box">
+            <div id="submit-review-info"></div>
             </div>
-            <div id="submit-review-questions-wrapper" style="display:none"></div>
-            <button id="submitReviewBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
-          </fieldset>
-        </form>
-        <div class="pure-u-1 l-box">
-          <div id="submit-review-info"></div>
+          </div>
         </div>
       </div>
     </div>

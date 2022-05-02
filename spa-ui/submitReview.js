@@ -12,16 +12,15 @@ const submitReview = async () => {
       const answersValues = [];
       const answers = document.getElementsByClassName('submit-review-answers');
       for(let answer of answers) {
-        if(answer.type == "text") {
-          answersValues.push(answer.value);
-        } else if (answer.type == "radio") {
+        if (answer.type == "radio") {
           if(answer.checked) {
             answersValues.push(answer.value);
           }
-        } 
+        } else {
+          answersValues.push(answer.value);
+        }
       };
-      console.log('answersValues', answersValues)
-      
+
       const validData = validateSubmitReviewFields(_name, submitTargetIndex);
       
       if(validData) {
@@ -88,7 +87,7 @@ const submitReview = async () => {
     
     answers = document.getElementsByClassName('submit-review-answers');
     for(let answer of answers) {
-      var validationMessage = answer.type == "text" ? answer.parentNode.parentNode.querySelector('.validation-error') : answer.parentNode.parentNode.parentNode.querySelector('.validation-error');
+      var validationMessage = answer.type == "radio" ?  answer.parentNode.parentNode.parentNode.querySelector('.validation-error') : answer.parentNode.parentNode.querySelector('.validation-error');
       if(answer.value){
         validationMessage.style = "display:none";
         validAnswers = true;
@@ -157,7 +156,7 @@ const submitReview = async () => {
   };
   
   function createTextQuestion(question) {
-    let questionHTML = `<label>${question}</label><div class="pure-g"><div class="pure-u-20-24"><textarea class="submit-review-answers" class="pure-input-1" placeholder="Enter your answer" rows="4" cols="90"></textarea></div><div class="pure-u-20-24"><small class="validation-error"></small></div></div><br/>`;  
+    let questionHTML = `<label>${question}</label><div class="pure-g"><div class="pure-u-20-24"><textarea class="submit-review-answers" class="pure-input-1" type="text" placeholder="Enter your answer" rows="4" cols="90"></textarea></div><div class="pure-u-20-24"><small class="validation-error"></small></div></div><br/>`;  
     return questionHTML;
   };
   
@@ -173,10 +172,10 @@ const submitReview = async () => {
           from: account,
         });
         
-        const rrNames = await contract.methods.reviewRequestNames().call();
+        const rrNames = await contract.methods.getReviewRequestsNames().call();
         const reviewRequestNameDropdown = document.getElementById("submit-review-name");
         let optionsHTML = ''
-        for (let i = 0; i < rrNames; i++) {
+        for (let i = 0; i < rrNames.length; i++) {
           optionsHTML += `<option value="${rrNames[i]}">${rrNames[i]}</option>`;
         }
         reviewRequestNameDropdown.innerHTML += optionsHTML;

@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../../css/app.css">
-    <script src="../../js/app.js"></script>
-    <script src="../../js/forms/createRequest.js"></script>
+    <link rel="stylesheet" href="app.css" type="text/css">
+    <script src="app.js" type="text/javascript"></script>
+    <script src="createRequest.js" type="text/javascript"></script>
     <title>DERESY</title>
   </head>
   <body>
     <div class="header">
       <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
-        <a class="pure-menu-heading" href="">DERESY</a>
+        <a class="pure-menu-heading" href="/">DERESY</a>
   
         <ul class="pure-menu-list">
           <li class="pure-menu-item"><div class="pure-menu-text" id="enableMM"></div></li>
@@ -42,7 +42,9 @@
             <label>Review Form Index</label>
             <div class="pure-g">
               <div class="pure-u-20-24">
-                <input id="reviewFormIndex" type="number" step="1" name="rewardPerReview" placeholder="Enter the Review Form Index" class="pure-input-1"/>
+                <select id="reviewFormIndex" class="pure-input-1">
+                  <option hidden selected value="">Select a Review Form index</option>
+                </select>
               </div>
             </div>
             <div class="pure-g">
@@ -98,6 +100,6 @@
         </form>
       </div>
     </div>
-    <script src="../../js/web3.js"></script>
+    <script src="web3.js" type="text/javascript"></script>
   </body>
 </html>

@@ -29,7 +29,7 @@ contract DeresyRequests {
 
     mapping(string => ReviewRequest) private reviewRequests;
 
-    string[] public reviewRequestNames;
+    string[] reviewRequestNames;
     uint256 public reviewFormsTotal;
 
     // mapping(string => Review[]) private reviews;
@@ -96,6 +96,10 @@ contract DeresyRequests {
 
     function getReviewForm(uint256 _reviewFormIndex) public view returns(string[] memory, QuestionType[] memory){
         return (reviewForms[_reviewFormIndex].questions,reviewForms[_reviewFormIndex].questionTypes);
+    }
+
+    function getReviewRequestsNames() public view returns(string[] memory){
+        return reviewRequestNames;
     }
 
     // function check2(string memory _name) public view returns(address){

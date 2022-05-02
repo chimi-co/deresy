@@ -16,26 +16,6 @@ const abi = [
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "reviewRequestNames",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
         "internalType": "string[]",
         "name": "questions",
         "type": "string[]"
@@ -223,12 +203,26 @@ const abi = [
     "stateMutability": "view",
     "type": "function",
     "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "getReviewRequestsNames",
+    "outputs": [
+      {
+        "internalType": "string[]",
+        "name": "",
+        "type": "string[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
   }
 ];
 
 let account;
 let web3;
-const contractAddress = "0x84cC54CeE26d2c415541e8a24295E7Be0071e797";
+const contractAddress = "0x95ae9d7C5880e684C45925e46Fc49D31bf4eab05";
 
 const handleAccountsChanged = (accounts) => {
   if (accounts.length === 0) {
@@ -244,8 +238,12 @@ const handleAccountsChanged = (accounts) => {
           "enableMM"
           ).innerHTML = `<small>Current account: ${account}</small>`;
           document.getElementById("connectBtn").style = "display: none";
-          //populateReviewFormIndexSelect();
-          //populateReviewRequestNameSelect();
+          var pathname = window.location.pathname
+          if(pathname == '/get_review_form.html' || pathname == '/create_request.html'){
+            populateReviewFormIndexSelect();
+          } else if(pathname == '/submit_review.html' || pathname == '/get_request.html' || pathname == '/close_request.html'){
+            populateReviewRequestNameSelect();
+          }
         } else {
           document.getElementById(
             "enableMM"
