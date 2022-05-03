@@ -10,23 +10,30 @@ const getRequest = async () => {
           from: account,
         });
         const request = await contract.methods.getRequest(name).call();
+        const reviewForm = await contract.methods.getReviewForm(request.reviewFormIndex).call();
+        var rfiText = document.getElementById("rfi-text");
+        rfiText.innerHTML = request.reviewFormIndex;
+        getReviewForm(reviewForm);
         if(request.reviewers.length > 0) {
           document.getElementById("request-table").style = "display: block";
           document.getElementById("request-info").style = "display: none";
+          document.getElementById("requestReviewFormIndexTd").innerHTML = request.reviewFormIndex;
           document.getElementById("requestReviewersTd").innerHTML = request.reviewers.join('<br>');
           document.getElementById("requestTargetsTd").innerHTML = request.targets.join('<br>');
           document.getElementById("requestIpfsHashTd").innerHTML = request.formIpfsHash;
           document.getElementById("requestRewardTd").innerHTML = `${request.rewardPerReview/1000000000000000000} ETH`;
-          document.getElementById("requestClosedTd").innerHTML = request.isClosed;
+          document.getElementById("requestClosedTd").innerHTML = request.isClosed ? 'Yes' : 'No';
           let reviewsText = "";
-          console.log(request)
-          if(request.review) {
-            request.review.forEach(review => {
-              reviewsText += `<strong>Reviewer:</strong> ${review.reviewer}<br><strong>Target Index:</strong> ${review.targetIndex}<br><strong><br>`
+          if(request.review.length > 0) {
+            request.review.forEach((review, index) => {
+              reviewsText += `<h3 style="margin:0% !important">Review #${index+1}</h3><strong>Reviewer:</strong> ${review.reviewer}<br><strong>Target:</strong> ${request.targets[review.targetIndex]}<br>`
               review.answers.forEach((answer, index) =>{
-                reviewsText += `<strong>Question ${index + 1}</strong><br>${answer}<br>`
-              })
+                reviewsText += `<strong>Question: </strong>${reviewForm[0][index]}<br><strong>Answer: </strong>${answer}<br>`
+              });
+              reviewsText += "<br>"
             })
+          } else {
+            reviewsText = 'There are no available reviews for this request yet'
           }
           document.getElementById("requestReviewsTd").innerHTML = reviewsText;
         } else {
@@ -41,6 +48,23 @@ const getRequest = async () => {
       throw error;
     }
   }
+};
+
+const getReviewForm = async (reviewForm) => {
+  var reviewFormTable = document.getElementById("review-form-table");
+  var rfTbody = document.getElementById('rfTbody');
+  rfTbody.innerHTML = '';
+  reviewForm[0].forEach( (question, index) => {
+    var rFormTr = document.createElement('tr');
+    var rFormQuestionTd = document.createElement('td');
+    var rFormQuestionTypeTd = document.createElement('td');
+    rFormTr.appendChild(rFormQuestionTd);
+    rFormTr.appendChild(rFormQuestionTypeTd);
+    rFormQuestionTd.innerHTML = question;
+    rFormQuestionTypeTd.innerHTML = reviewForm[1][index] == 0 ? 'Text' : 'Checkbox';
+    rfTbody.appendChild(rFormTr);
+  });
+  reviewFormTable.style = "display: block;margin-bottom: 5%;";
 };
 
 const validateGetRequestFields = (name) => {

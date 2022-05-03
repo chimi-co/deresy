@@ -1,6 +1,12 @@
 const createRequest = async () => {
   if (account) {
+    let alertBox = document.getElementById("create-request-info");
     try {
+      alertBox.innerHTML="";
+      alertBox.classList.remove("error");
+      alertBox.classList.remove("success");
+      alertBox.classList.remove("info");
+
       const { eth } = web3;
       const contract = new eth.Contract(abi, contractAddress, {
         from: account,
@@ -43,22 +49,30 @@ const createRequest = async () => {
           await web3.eth
           .sendTransaction(transaction)
           .on("transactionHash", (txHash) => {
-            document.getElementById("msg-transaction").innerHTML = "In Progress...";
+            alertBox.classList.remove("error");
+            alertBox.classList.remove("success");
+            alertBox.classList.add("info");
+            alertBox.innerHTML = 'In Progress... <img width="2%" src="spinner.gif"/>';
           })
           .on("receipt", function (receipt) {
-            document.getElementById("msg-transaction").innerHTML = "Successful...";
+            alertBox.classList.remove("error");
+            alertBox.classList.remove("info");
+            alertBox.classList.add("success");
+            alertBox.innerHTML = "Successful!";
           })
           .on("error", console.error);
         }
       } catch (error) {
-        document.getElementById("msg-transaction").innerHTML = "Error...";
+        alertBox.classList.remove("warning");
+        alertBox.classList.remove("info");
+        alertBox.classList.remove("success");
+        alertBox.classList.add("error");
+        alertBox.innerHTML = "Error...";
         if (error.code === 4001) {
-          document.getElementById("msg-transaction").innerHTML =
-          "user rejected transaction...";
+          alertBox.innerHTML = "User rejected transaction...";
         }
         if (error.code === -32603) {
-          document.getElementById("msg-transaction").innerHTML =
-          "caller is not the owner...";
+          alertBox.innerHTML = "Caller is not the owner...";
         }
         throw error;
       }

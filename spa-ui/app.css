@@ -170,4 +170,29 @@
       .xl-button-div{
         text-align: center;
       }
+
+      .alert {
+        padding: 20px;
+        color: white;
+        margin: 0.5%;
+        border-radius: 10px;
+        text-align: center;
+        font-weight: bold;
+      }
+
+      .alert.warning {
+        background-color: #ff9800;
+      }
+
+      .alert.success {
+        background-color: #04AA6D;
+      }
+
+      .alert.info {
+        background-color: #2196F3;
+      }
+
+      .alert.error {
+        background-color: #f44336;;
+      }
       

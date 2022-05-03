@@ -21,7 +21,8 @@
         </ul>
       </div>
     </div>
-    <div class="content-wrapper"> 
+    <div class="content-wrapper">
+      <div class="pure-u-11-12 l-box alert warning" id="network-info" style="display:none;">Please connect to the Arbitrum Network</div> 
       <div class="pure-u-1 l-box">
         <form class="pure-form pure-form-stacked">
           <fieldset>
@@ -42,30 +43,50 @@
         </form>
         <div class="pure-u-1 l-box">
           <div id="request-info" style="display:none"></div>
+          <div id="review-form-table" style="display:none;">
+            <h2>Review Forms</h2>
+            <strong>Review Form Index: </strong>
+            <span id="rfi-text"></span>
+            <table class="pure-table pure-table-bordered">
+              <thead>
+                <tr>
+                  <th>Question</th>
+                  <th>Question Type</th>
+                </tr>
+              </thead>
+              <tbody id="rfTbody">
+              </tbody>
+            </table>
+          </div>
           <div id="request-table" style="display:none">
+            <h2>Review Request</h2>
             <table class="pure-table">
               <tbody>
                 <tr class="pure-table-odd">
+                  <td>Review Form index</td>
+                  <td id="requestReviewFormIndexTd"></td>
+                </tr>
+                <tr>
                   <td>Reviewers</td>
                   <td id="requestReviewersTd"></td>
                 </tr>
-                <tr>
+                <tr class="pure-table-odd">
                   <td>Targets</td>
                   <td id="requestTargetsTd"></td>
                 </tr>
-                <tr class="pure-table-odd">
+                <tr>
                   <td>IPFS Hash</td>
                   <td id="requestIpfsHashTd"></td>
                 </tr>
-                <tr>
+                <tr class="pure-table-odd">
                   <td>Reward per review</td>
                   <td id="requestRewardTd"></td>
                 </tr>
-                <tr class="pure-table-odd">
+                <tr>
                   <td>Is closed?</td>
                   <td id="requestClosedTd"></td>
                 </tr>
-                <tr>
+                <tr class="pure-table-odd">
                   <td>Reviews</td>
                   <td id="requestReviewsTd"></td>
                 </tr>

@@ -1,6 +1,12 @@
 const closeRequest = async () => {
   if (account) {
+    let alertBox = document.getElementById("close-request-info");
     try {
+      alertBox.innerHTML="";
+      alertBox.classList.remove("error");
+      alertBox.classList.remove("success");
+      alertBox.classList.remove("info");
+
       const { eth } = web3;
       const contract = new eth.Contract(abi, contractAddress, {
         from: account,
@@ -27,18 +33,27 @@ const closeRequest = async () => {
           await web3.eth
           .sendTransaction(transaction)
           .on("transactionHash", (txHash) => {
-            document.getElementById("close-request-info").innerHTML = "In Progress...";
+            alertBox.classList.remove("error");
+            alertBox.classList.remove("success");
+            alertBox.classList.add("info");
+            alertBox.innerHTML = 'In Progress... <img width="2%" src="spinner.gif"/>';
           })
           .on("receipt", function (receipt) {
-            document.getElementById("close-request-info").innerHTML = "Successful...";
+            alertBox.classList.remove("error");
+            alertBox.classList.remove("info");
+            alertBox.classList.add("success");
+            alertBox.innerHTML = "Successful!";
           })
           .on("error", console.error);
         }
       } catch (error) {
-        document.getElementById("close-request-info").innerHTML = "error...";
+        alertBox.classList.remove("warning");
+        alertBox.classList.remove("info");
+        alertBox.classList.remove("success");
+        alertBox.classList.add("error");
+        alertBox.innerHTML = "Error...";
         if (error.code === 4001) {
-          document.getElementById("close-request-info").innerHTML =
-          "user rejected transaction...";
+          alertBox.innerHTML = "User rejected transaction...";
         }
         throw error;
       }

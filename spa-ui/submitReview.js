@@ -1,6 +1,12 @@
 const submitReview = async () => {
   if (account) {
+    let alertBox = document.getElementById("submit-review-info");
     try {
+      alertBox.innerHTML="";
+      alertBox.classList.remove("error");
+      alertBox.classList.remove("success");
+      alertBox.classList.remove("info");
+
       const { eth } = web3;
       const contract = new eth.Contract(abi, contractAddress, {
         from: account,
@@ -41,18 +47,27 @@ const submitReview = async () => {
           await web3.eth
           .sendTransaction(transaction)
           .on("transactionHash", (txHash) => {
-            document.getElementById("submit-review-info").innerHTML = "In Progress...";
+            alertBox.classList.remove("error");
+            alertBox.classList.remove("success");
+            alertBox.classList.add("info");
+            alertBox.innerHTML = 'In Progress... <img width="2%" src="spinner.gif"/>';
           })
           .on("receipt", function (receipt) {
-            document.getElementById("submit-review-info").innerHTML = "Successful...";
+            alertBox.classList.remove("error");
+            alertBox.classList.remove("info");
+            alertBox.classList.add("success");
+            alertBox.innerHTML = "Successful!";
           })
           .on("error", console.error);
         }
       } catch (error) {
-        document.getElementById("submit-review-info").innerHTML = "error...";
+        alertBox.classList.remove("warning");
+        alertBox.classList.remove("info");
+        alertBox.classList.remove("success");
+        alertBox.classList.add("error");
+        alertBox.innerHTML = "Error...";
         if (error.code === 4001) {
-          document.getElementById("submit-review-info").innerHTML =
-          "user rejected transaction...";
+          alertBox.innerHTML = "User rejected transaction...";
         }
         throw error;
       }
@@ -113,24 +128,33 @@ const submitReview = async () => {
             from: account,
           });
           const reviewRequest = await contract.methods.getRequest(reviewName).call();
-          const requestTargets = reviewRequest.targets;
-          const reviewFormIndex = reviewRequest.reviewFormIndex;
-          const reviewForm = await contract.methods.getReviewForm(reviewFormIndex).call();
-          const questions = reviewForm[0]
-          const questionTypes = reviewForm[1]
-          
-          let questionsHTML = `<label>Target</label><div class="pure-g"><div class="pure-u-20-24"><select id="submit-review-target-index" class="pure-input-1"><option hidden selected value="">Select the target for your review</option><select/></div><div class="pure-u-20-24"><small id="submit-review-target-index-validation" class="validation-error"></small></div></div>`
-          
-          questionTypes.forEach( (questionType,index) => {
-            questionsHTML += questionType == 0 ?  createTextQuestion(questions[index]) : createCheckboxQuestion(questions[index], index);
-          });
-          document.getElementById("submit-review-questions-wrapper").innerHTML = questionsHTML;
-          document.getElementById("submit-review-questions-wrapper").style = "display:block";
-          
-          const targetIndexSelect = document.getElementById('submit-review-target-index');
-          for (let i = 0; i < requestTargets.length; i++) {
-            targetIndexSelect.innerHTML += `<option value="${i}">${requestTargets[i]}</option>`;
+          let questionsHTML = "";
+          if(reviewRequest.isClosed) {
+            questionsHTML = "<strong>This request is closed and does no longer accept reviews.</strong>";
+            document.getElementById("submit-review-questions-wrapper").innerHTML = questionsHTML;
+          } else if(reviewRequest.reviewers.filter((reviewer) => reviewer.toLowerCase().includes(account.toLowerCase())) < 1){
+            questionsHTML = `<strong>Your address (${account}) is not authorized to submit a review for this request</strong>`;
+            document.getElementById("submit-review-questions-wrapper").innerHTML = questionsHTML;
+          } else {
+            const requestTargets = reviewRequest.targets;
+            const reviewFormIndex = reviewRequest.reviewFormIndex;
+            const reviewForm = await contract.methods.getReviewForm(reviewFormIndex).call();
+            const questions = reviewForm[0]
+            const questionTypes = reviewForm[1]
+            
+            questionsHTML = `<label>Target</label><div class="pure-g"><div class="pure-u-20-24"><select id="submit-review-target-index" class="pure-input-1"><option hidden selected value="">Select the target for your review</option><select/></div><div class="pure-u-20-24"><small id="submit-review-target-index-validation" class="validation-error"></small></div></div>`
+            
+            questionTypes.forEach( (questionType,index) => {
+              questionsHTML += questionType == 0 ?  createTextQuestion(questions[index]) : createCheckboxQuestion(questions[index], index);
+            });
+
+            document.getElementById("submit-review-questions-wrapper").innerHTML = questionsHTML;
+            const targetIndexSelect = document.getElementById('submit-review-target-index');
+            for (let i = 0; i < requestTargets.length; i++) {
+              targetIndexSelect.innerHTML += `<option value="${i}">${requestTargets[i]}</option>`;
+            };
           }
+          document.getElementById("submit-review-questions-wrapper").style = "display:block";
         }
       } catch (error) {
         throw error;
