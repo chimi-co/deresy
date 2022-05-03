@@ -1,5 +1,6 @@
 const createReviewForm = async () => {
   if (account) {
+    let alertBox = document.getElementById("create-review-form-info");
     try {
       alertBox.innerHTML="";
       alertBox.classList.remove("error");
@@ -19,8 +20,6 @@ const createReviewForm = async () => {
       
       
       const validData = validateCreateReviewForm();
-      
-      let alertBox = document.getElementById("create-review-form-info");
 
       if(validData) {
         const data = await contract.methods
