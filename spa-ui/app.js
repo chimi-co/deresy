@@ -163,7 +163,7 @@ const abi = [
           }
         ],
         "internalType": "struct DeresyRequests.Review[]",
-        "name": "review",
+        "name": "reviews",
         "type": "tuple[]"
       },
       {
@@ -220,11 +220,11 @@ const abi = [
     "type": "function",
     "constant": true
   }
-];
+]
 
 let account;
 let web3;
-const contractAddress = "0x95ae9d7C5880e684C45925e46Fc49D31bf4eab05";
+const contractAddress = "0x0244b1FB1b911C489af2a8A4D2df8d8489C49866";
 
 const handleAccountsChanged = (accounts) => {
   if (accounts.length === 0) {

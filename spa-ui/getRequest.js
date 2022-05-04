@@ -24,8 +24,8 @@ const getRequest = async () => {
           document.getElementById("requestRewardTd").innerHTML = `${request.rewardPerReview/1000000000000000000} ETH`;
           document.getElementById("requestClosedTd").innerHTML = request.isClosed ? 'Yes' : 'No';
           let reviewsText = "";
-          if(request.review.length > 0) {
-            request.review.forEach((review, index) => {
+          if(request.reviews.length > 0) {
+            request.reviews.forEach((review, index) => {
               reviewsText += `<h3 style="margin:0% !important">Review #${index+1}</h3><strong>Reviewer:</strong> ${review.reviewer}<br><strong>Target:</strong> ${request.targets[review.targetIndex]}<br>`
               review.answers.forEach((answer, index) =>{
                 reviewsText += `<strong>Question: </strong>${reviewForm[0][index]}<br><strong>Answer: </strong>${answer}<br>`
