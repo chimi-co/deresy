@@ -236,10 +236,10 @@ const handleAccountsChanged = (accounts) => {
     if (account != null) {
       document.getElementById("enableMM").innerHTML = `<small>Current account: ${account}</small>`;
       document.getElementById("connectBtn").style = "display: none";
-      var pathname = window.location.pathname
-      if(pathname == '/get_review_form.html' || pathname == '/create_request.html'){
+      var pathname = window.location.pathname.split("/").pop()
+      if(pathname == 'get_review_form.html' || pathname == 'create_request.html'){
         populateReviewFormIndexSelect();
-      } else if(pathname == '/submit_review.html' || pathname == '/get_request.html' || pathname == '/close_request.html'){
+      } else if(pathname == 'submit_review.html' || pathname == 'get_request.html' || pathname == 'close_request.html'){
         populateReviewRequestNameSelect();
       }
     } else {
@@ -268,7 +268,6 @@ const connect = () => {
 
 const handleNetworkMessage = (chainId) => {
   let networkAlert = document.getElementById("network-info");
-  console.log(chainId)
   if(chainId == ARBITRUM_NETWORK_ID) {
     networkAlert.style = "display:none";
   } else {
