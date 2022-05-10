@@ -117,13 +117,21 @@ const createRequest = async () => {
       validReward = false;
     }
     
-    targetFields = document.getElementsByName('targets[]');
+    var targetFields = document.getElementsByName('targets[]');
+    var targetValues = [];
     
     targetFields.forEach(function(target) {
       var validationMessage = target.parentNode.parentNode.querySelector('.validation-error');
       if(target.value){
-        validationMessage.style = "display:none";
-        validTargets = true;
+        if(targetValues.includes(target.value)){
+          validationMessage.innerHTML = "Duplicated target";
+          validationMessage.style = "display:block";
+          validTargets = false;
+        } else {
+          targetValues.push(target.value);
+          validationMessage.style = "display:none";
+          validTargets = true;
+        }
       } else {
         validationMessage.innerHTML = "This is a required field";
         validationMessage.style = "display:block";
@@ -131,19 +139,30 @@ const createRequest = async () => {
       }
     });
     
-    reviewerFields = document.getElementsByName('reviewers[]');
+    var reviewerFields = document.getElementsByName('reviewers[]');
+    var reviewerValues = []
     
     reviewerFields.forEach(function(reviewer) {
       var validationMessage = reviewer.parentNode.parentNode.querySelector('.validation-error');
       if(reviewer.value){
-        var re = /^0x[a-fA-F0-9]{40}$/g;
-        if(re.test(reviewer.value)) {
-          validationMessage.style = "display:none";
-          validReviewers = true;
-        } else {
-          validationMessage.innerHTML = "This is not a valid ETH address";
+        console.log('reviewerValues', reviewerValues);
+        console.log('reviewer.value', reviewer.value);
+        console.log(reviewerValues.includes(reviewer.value));
+        if(reviewerValues.includes(reviewer.value)){
+          validationMessage.innerHTML = "Duplicated reviewer address";
           validationMessage.style = "display:block";
-          validReviewers = false;
+          validTargets = false;
+        } else {
+          var re = /^0x[a-fA-F0-9]{40}$/g;
+          if(re.test(reviewer.value)) {
+            reviewerValues.push(reviewer.value);
+            validationMessage.style = "display:none";
+            validReviewers = true;
+          } else {
+            validationMessage.innerHTML = "This is not a valid ETH address";
+            validationMessage.style = "display:block";
+            validReviewers = false;
+          }
         }
       } else {
         validationMessage.innerHTML = "This is a required field";
@@ -235,14 +254,23 @@ const createRequest = async () => {
         const contract = new web3.eth.Contract(abi, contractAddress, {
           from: account,
         });
-        console.log(contract);
         const rfTotal = await contract.methods.reviewFormsTotal().call();
-        const formIndexDropdown = document.getElementById("reviewFormIndex");
-        let optionsHTML = ''
-        for (let i = 0; i < rfTotal; i++) {
-          optionsHTML += `<option value="${i}">${i}</option>`;
+        const noResultsDiv = document.getElementById("no-results-message");
+        const createRequestDiv = document.getElementById("create-request-div");
+        if(rfTotal > 0) {
+          const formIndexDropdown = document.getElementById("reviewFormIndex");
+          createRequestDiv.style = "display:block";
+          noResultsDiv.style = "display:none";
+          let optionsHTML = ''
+          for (let i = 0; i < rfTotal; i++) {
+            optionsHTML += `<option value="${i}">${i}</option>`;
+          }
+          formIndexDropdown.innerHTML += optionsHTML;
+        } else {
+          noResultsDiv.innerHTML = '<strong>There are no Review Forms in the system at this time. <a href="./create_review_form.html">Click here</a> to create a Review Form</strong>'
+          noResultsDiv.style = "display:block";
+          createRequestDiv.style = "display:none";
         }
-        formIndexDropdown.innerHTML += optionsHTML;
       } catch (error) {
         throw error;
       }

@@ -28,8 +28,8 @@
           <form class="pure-form pure-form-stacked">
             <fieldset>
               <legend class="form-title">Create Request</legend>
-              <label>Name</label>
-              <div>
+              <div id="create-request-div" style="display:none">
+                <label>Name</label>
                 <div class="pure-g">
                   <div class="pure-u-20-24">
                     <input id="requestName" type="text" name="requestName" placeholder="Enter a name for the request" class="pure-input-1"/>
@@ -40,64 +40,65 @@
                     <small id="name-validation" class="validation-error"></small>
                   </div>
                 </div>
-              </div>
-              <label>Review Form Index</label>
-              <div class="pure-g">
-                <div class="pure-u-20-24">
-                  <select id="reviewFormIndex" class="pure-input-1">
-                    <option hidden selected value="">Select a Review Form index</option>
-                  </select>
-                </div>
-              </div>
-              <div class="pure-g">
-                <div class="pure-u-20-24">
-                  <small id="review-form-index-validation" class="validation-error"></small>
-                </div>
-              </div>
-              <label>Reviewers</label>
-              <div id="reviewerWrapper">
+                <label>Review Form Index</label>
                 <div class="pure-g">
                   <div class="pure-u-20-24">
-                    <input class="pure-input-1" type="text" placeholder="Enter a reviewer" name="reviewers[]"/>
-                  </div>
-                  <div class="pure-u-1-6"></div>
-                  <div class="pure-u-20-24">
-                    <small class="validation-error"></small>
+                    <select id="reviewFormIndex" class="pure-input-1">
+                      <option hidden selected value="">Select a Review Form index</option>
+                    </select>
                   </div>
                 </div>
-              </div>
-              <button class="pure-button button-success" style="margin-top: 15px" id="addReviewersBtn" type="button">Add Reviewer</button>
-              <label>Targets</label>
-              <div id="targetWrapper">
                 <div class="pure-g">
                   <div class="pure-u-20-24">
-                    <input class="pure-input-1" type="text" placeholder="Enter a target" name="targets[]"/>
+                    <small id="review-form-index-validation" class="validation-error"></small>
                   </div>
-                  <div class="pure-u-1-6"></div>
+                </div>
+                <label>Reviewers</label>
+                <div id="reviewerWrapper">
+                  <div class="pure-g">
+                    <div class="pure-u-20-24">
+                      <input class="pure-input-1" type="text" placeholder="Enter a reviewer" name="reviewers[]"/>
+                    </div>
+                    <div class="pure-u-1-6"></div>
+                    <div class="pure-u-20-24">
+                      <small class="validation-error"></small>
+                    </div>
+                  </div>
+                </div>
+                <button class="pure-button button-success" style="margin-top: 15px" id="addReviewersBtn" type="button">Add Reviewer</button>
+                <label>Targets</label>
+                <div id="targetWrapper">
+                  <div class="pure-g">
+                    <div class="pure-u-20-24">
+                      <input class="pure-input-1" type="text" placeholder="Enter a target" name="targets[]"/>
+                    </div>
+                    <div class="pure-u-1-6"></div>
+                    <div class="pure-u-20-24">
+                      <small class="validation-error"></small>
+                    </div>
+                  </div>
+                </div>
+                <button class="pure-button button-success" style="margin-top: 15px" id="addTargetsBtn" type="button">Add Target</button>
+                <label>IPFS Hash</label>
+                <div class="pure-g">
                   <div class="pure-u-20-24">
-                    <small class="validation-error"></small>
+                    <input id="ipfsHash" type="text" name="ipfsHash" placeholder="Enter the IPFS Hash" class="pure-input-1"/>
                   </div>
                 </div>
-              </div>
-              <button class="pure-button button-success" style="margin-top: 15px" id="addTargetsBtn" type="button">Add Target</button>
-              <label>IPFS Hash</label>
-              <div class="pure-g">
-                <div class="pure-u-20-24">
-                  <input id="ipfsHash" type="text" name="ipfsHash" placeholder="Enter the IPFS Hash" class="pure-input-1"/>
+                <label>Reward per Review</label>
+                <div class="pure-g">
+                  <div class="pure-u-20-24">
+                    <input id="rewardPerReview" type="number" step="any" name="rewardPerReview" placeholder="Enter the reward per review" class="pure-input-1"/>
+                  </div>
                 </div>
-              </div>
-              <label>Reward per Review</label>
-              <div class="pure-g">
-                <div class="pure-u-20-24">
-                  <input id="rewardPerReview" type="number" step="any" name="rewardPerReview" placeholder="Enter the reward per review" class="pure-input-1"/>
+                <div class="pure-g">
+                  <div class="pure-u-20-24">
+                    <small id="reward-validation" class="validation-error"></small>
+                  </div>
                 </div>
+                <button id="createRequestBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
               </div>
-              <div class="pure-g">
-                <div class="pure-u-20-24">
-                  <small id="reward-validation" class="validation-error"></small>
-                </div>
-              </div>
-              <button id="createRequestBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
+              <div id="no-results-message" style="display: none;"></div>
             </fieldset>
           </form>
         </div>

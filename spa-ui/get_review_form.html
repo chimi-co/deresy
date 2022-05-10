@@ -28,24 +28,27 @@
           <form class="pure-form pure-form-stacked">
             <fieldset>
               <legend class="form-title">Get Review Form</legend>
-              <div id="questionWrapper">
-                <div class="pure-g">
-                  <div class="pure-u-1">
-                    <label>Review Form Index</label>
-                  </div>
-                  <div class="pure-u-1">
-                    <select id="get-review-form-index" class="pure-input-1">
-                      <option hidden selected value="">Select a Review Form index</option>
-                    </select>
-                  </div>
-                  <div class="pure-u-1">
-                    <small class="validation-error" id="get-review-form-index-validation"></small>
+              <div id="get-review-form-div" style="display:none">
+                <div id="questionWrapper">
+                  <div class="pure-g">
+                    <div class="pure-u-1">
+                      <label>Review Form Index</label>
+                    </div>
+                    <div class="pure-u-1">
+                      <select id="get-review-form-index" class="pure-input-1">
+                        <option hidden selected value="">Select a Review Form index</option>
+                      </select>
+                    </div>
+                    <div class="pure-u-1">
+                      <small class="validation-error" id="get-review-form-index-validation"></small>
+                    </div>
                   </div>
                 </div>
+                <div class="pure-u-1">
+                  <button id="getReviewFormBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
+                </div>
               </div>
-              <div class="pure-u-1">
-                <button id="getReviewFormBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
-              </div>
+              <div id="no-results-message" style="display: none;"></div>
             </fieldset>
           </form>
         </div>

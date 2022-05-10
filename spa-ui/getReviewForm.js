@@ -64,14 +64,23 @@ const populateReviewFormIndexSelect = async () => {
       const contract = new web3.eth.Contract(abi, contractAddress, {
         from: account,
       });
-      console.log(contract);
-      const rfTotal = await contract.methods.reviewFormsTotal().call();
-      const formIndexDropdown = document.getElementById("get-review-form-index");
-      let optionsHTML = ''
-      for (let i = 0; i < rfTotal; i++) {
-        optionsHTML += `<option value="${i}">${i}</option>`;
+      const rfTotal =  await contract.methods.reviewFormsTotal().call();
+      const noResultsDiv = document.getElementById("no-results-message");
+      const getReviewFormDiv = document.getElementById("get-review-form-div");
+      if(rfTotal > 0){
+        const formIndexDropdown = document.getElementById("get-review-form-index");
+        getReviewFormDiv.style = "display:block";
+        noResultsDiv.style = "display:none";
+        let optionsHTML = ''
+        for (let i = 0; i < rfTotal; i++) {
+          optionsHTML += `<option value="${i}">${i}</option>`;
+        }
+        formIndexDropdown.innerHTML += optionsHTML;
+      } else {
+        noResultsDiv.innerHTML = '<strong>There are no Review Forms in the system at this time. <a href="./create_review_form.html">Click here</a> to create a Review Form</strong>'
+        noResultsDiv.style = "display:block";
+        getReviewFormDiv.style = "display:none";
       }
-      formIndexDropdown.innerHTML += optionsHTML;
     } catch (error) {
       throw error;
     }

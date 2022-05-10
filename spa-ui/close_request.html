@@ -28,8 +28,8 @@
           <form class="pure-form pure-form-stacked">
             <fieldset>
               <legend class="form-title">Close Review Request</legend>
-              <label>Review Request Name</label>
-              <div class="pure-g">
+              <div id="close-request-div" style="display:none">
+                <label>Review Request Name</label>
                 <div class="pure-u-20-24">
                   <select class="pure-input-1" id="closeRequestName">
                     <option selected hidden value="">Select the review request name</option>
@@ -38,8 +38,11 @@
                 <div class="pure-u-20-24">
                   <small id="close-request-name-validation" class="validation-error"></small>
                 </div>
+                <div class="pure-u-1">
+                  <button id="closeRequestBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
+                </div>
               </div>
-              <button id="closeRequestBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
+              <div id="no-results-message" style="display:none"></div>
             </fieldset>
           </form>
         </div>

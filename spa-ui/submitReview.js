@@ -153,6 +153,7 @@ const submitReview = async () => {
             for (let i = 0; i < requestTargets.length; i++) {
               targetIndexSelect.innerHTML += `<option value="${i}">${requestTargets[i]}</option>`;
             };
+            document.getElementById("submitReviewBtn").style = "display:block";
           }
           document.getElementById("submit-review-questions-wrapper").style = "display:block";
         }
@@ -197,12 +198,22 @@ const submitReview = async () => {
         });
         
         const rrNames = await contract.methods.getReviewRequestsNames().call();
-        const reviewRequestNameDropdown = document.getElementById("submit-review-name");
-        let optionsHTML = ''
-        for (let i = 0; i < rrNames.length; i++) {
-          optionsHTML += `<option value="${rrNames[i]}">${rrNames[i]}</option>`;
+        const noResultsDiv = document.getElementById("no-results-message");
+        const submitReviewDiv = document.getElementById("submit-review-div");
+        if(rrNames.length > 0){
+          const reviewRequestNameDropdown = document.getElementById("submit-review-name");
+          noResultsDiv.style = "display:none";
+          submitReviewDiv.style = "display:block";
+          let optionsHTML = ''
+          for (let i = 0; i < rrNames.length; i++) {
+            optionsHTML += `<option value="${rrNames[i]}">${rrNames[i]}</option>`;
+          }
+          reviewRequestNameDropdown.innerHTML += optionsHTML;
+        } else{
+          noResultsDiv.innerHTML = '<strong>There are no Review Requests in the system at this time. <a href="./create_request.html">Click here</a> to create a Review Request</strong>'
+          noResultsDiv.style = "display:block";
+          submitReviewDiv.style = "display:none";
         }
-        reviewRequestNameDropdown.innerHTML += optionsHTML;
       } catch (error) {
         throw error;
       }
@@ -211,6 +222,7 @@ const submitReview = async () => {
 
   const resetSubmitQuestions = () => {
     document.getElementById("submit-review-questions-wrapper").style = "display:none"
+    document.getElementById("submitReviewBtn").style = "display:none";
   };
 
   var prev_onLoad = window.onload;
