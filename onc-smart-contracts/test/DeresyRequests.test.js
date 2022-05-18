@@ -72,12 +72,14 @@ contract('DeresyRequests', (accounts) => {
       let requestName = "RRC1"
       let reviewersArray = [reviewerAddress1, reviewerAddress2, reviewerAddress3]
       let targetsArray = [target1, target2]
+      let targetsIPFSHashes = ["hash1", "hash2"]
       let ipfsHash = "hash"
       let reviewFormIndex = reviewFormsTotal - 1
-      await truffleAssert.passes(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length }))
+      await truffleAssert.passes(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length }))
       let request = await deresyRequests.getRequest(requestName)
       assert.deepEqual(request.reviewers, reviewersArray)
       assert.deepEqual(request.targets, targetsArray)
+      assert.deepEqual(request.targetsIPFSHashes, targetsIPFSHashes)
       assert.equal(request.formIpfsHash, ipfsHash)
       assert.equal(request.rewardPerReview, rewardPerReview1)
       assert.equal(request.reviewFormIndex.toNumber(), reviewFormIndex)
@@ -94,10 +96,11 @@ contract('DeresyRequests', (accounts) => {
       let requestName = "RRC2"
       let reviewersArray = []
       let targetsArray = [target1, target2]
+      let targetsIPFSHashes = ["hash1", "hash2"]
       let ipfsHash = "hash"
       let reviewFormIndex = reviewFormsTotal - 1
 
-      await truffleAssert.reverts(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1  * targetsArray.length }))
+      await truffleAssert.reverts(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1  * targetsArray.length }))
     })
 
     it("should revert if targets array is null", async () => {
@@ -109,20 +112,22 @@ contract('DeresyRequests', (accounts) => {
       let requestName = "RRC3"
       let reviewersArray = [reviewerAddress1, reviewerAddress2, reviewerAddress3]
       let targetsArray = []
+      let targetsIPFSHashes = ["hash1", "hash2"]
       let ipfsHash = "hash"
       let reviewFormIndex = reviewFormsTotal - 1
 
-      await truffleAssert.reverts(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length }))
+      await truffleAssert.reverts(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length }))
     })
 
     it("should revert if reviewFormIndex is invalid", async () => {
       let requestName = "RRC4"
       let reviewersArray = [reviewerAddress1, reviewerAddress2, reviewerAddress3]
       let targetsArray = [target1, target2]
+      let targetsIPFSHashes = ["hash1", "hash2"]
       let ipfsHash = "hash"
       let reviewFormIndex = 100000
 
-      await truffleAssert.reverts(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length }))
+      await truffleAssert.reverts(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length }))
     })
 
     it("should revert if rewardPerReview <= 0", async () => {
@@ -134,10 +139,11 @@ contract('DeresyRequests', (accounts) => {
       let requestName = "RRC5"
       let reviewersArray = [reviewerAddress1, reviewerAddress2, reviewerAddress3]
       let targetsArray = [target1, target2]
+      let targetsIPFSHashes = ["hash1", "hash2"]
       let ipfsHash = "hash"
       let reviewFormIndex = reviewFormsTotal - 1
 
-      await truffleAssert.reverts(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, ipfsHash, 0, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length }))
+      await truffleAssert.reverts(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, 0, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length }))
     })
 
     it("should revert if name is duplicated", async () => {
@@ -149,11 +155,12 @@ contract('DeresyRequests', (accounts) => {
       let requestName = "RRC6"
       let reviewersArray = [reviewerAddress1, reviewerAddress2, reviewerAddress3]
       let targetsArray = [target1, target2]
+      let targetsIPFSHashes = ["hash1", "hash2"]
       let ipfsHash = "hash"
       let reviewFormIndex = reviewFormsTotal - 1
       
-      await truffleAssert.passes(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length }))
-      await truffleAssert.reverts(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length }))
+      await truffleAssert.passes(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length }))
+      await truffleAssert.reverts(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length }))
     })
 
     it("should revert if msg.value is invalid", async () => {
@@ -165,10 +172,11 @@ contract('DeresyRequests', (accounts) => {
       let requestName = "RRC7"
       let reviewersArray = [reviewerAddress1, reviewerAddress2, reviewerAddress3]
       let targetsArray = [target1, target2]
+      let targetsIPFSHashes = ["hash1", "hash2"]
       let ipfsHash = "hash"
       let reviewFormIndex = reviewFormsTotal - 1
 
-      await truffleAssert.reverts(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 }))
+      await truffleAssert.reverts(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 }))
     })
 
     it("should pass if ipfsHash is empty", async () => {
@@ -180,10 +188,59 @@ contract('DeresyRequests', (accounts) => {
       let requestName = "RRC8"
       let reviewersArray = [reviewerAddress1, reviewerAddress2, reviewerAddress3]
       let targetsArray = [target1, target2]
+      let targetsIPFSHashes = ["hash1", "hash2"]
       let ipfsHash = ""
       let reviewFormIndex = reviewFormsTotal - 1
       
-      await truffleAssert.passes(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length }))
+      await truffleAssert.passes(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length }))
+    })
+
+    it("should revert if targetsIPFSHashes array is empty", async () => {
+      let questionsArray = ["Q1", "Q2"]
+      let questionTypesArray = [0, 1]
+      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
+
+      let requestName = "RRC9"
+      let reviewersArray = [reviewerAddress1, reviewerAddress2, reviewerAddress3]
+      let targetsArray = [target1, target2]
+      let targetsIPFSHashes = []
+      let ipfsHash = ""
+      let reviewFormIndex = reviewFormsTotal - 1
+      
+      await truffleAssert.reverts(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length }))
+    })
+
+    it("should revert if targetsIPFSHashes and targets arrays have different length", async () => {
+      let questionsArray = ["Q1", "Q2"]
+      let questionTypesArray = [0, 1]
+      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
+
+      let requestName = "RRC10"
+      let reviewersArray = [reviewerAddress1, reviewerAddress2, reviewerAddress3]
+      let targetsArray = [target1, target2]
+      let targetsIPFSHashes = ["hash1"]
+      let ipfsHash = ""
+      let reviewFormIndex = reviewFormsTotal - 1
+      
+      await truffleAssert.reverts(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length }))
+    })
+
+    it("should pass if targetsIPFSHashes array contains empty strings", async () => {
+      let questionsArray = ["Q1", "Q2"]
+      let questionTypesArray = [0, 1]
+      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
+
+      let requestName = "RRC10"
+      let reviewersArray = [reviewerAddress1, reviewerAddress2, reviewerAddress3]
+      let targetsArray = [target1, target2]
+      let targetsIPFSHashes = ["", ""]
+      let ipfsHash = ""
+      let reviewFormIndex = reviewFormsTotal - 1
+      
+      await truffleAssert.passes(deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length }))
     })
   })
 
@@ -198,9 +255,10 @@ contract('DeresyRequests', (accounts) => {
       let requestName = "CRR1"
       let reviewersArray = [reviewerAddress1, reviewerAddress3]
       let targetsArray = [target1, target2]
+      let targetsIPFSHashes = ["hash1", "hash2"]
       let ipfsHash = "hash"
       let reviewFormIndex = reviewFormsTotal - 1
-      await deresyRequests.createRequest(requestName, reviewersArray, targetsArray, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length })
+      await deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length })
       
       await truffleAssert.passes(deresyRequests.closeReviewRequest(requestName, { from: ownerAddress, value: 0 }))
       let request = await deresyRequests.getRequest(requestName)
@@ -216,9 +274,10 @@ contract('DeresyRequests', (accounts) => {
       let requestName = "CRR2"
       let reviewersArray = [reviewerAddress1, reviewerAddress3]
       let targetsArray = [target1, target2]
+      let targetsIPFSHashes = ["hash1", "hash2"]
       let ipfsHash = "hash"
       let reviewFormIndex = reviewFormsTotal - 1
-      await deresyRequests.createRequest(requestName, reviewersArray, targetsArray, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length })
+      await deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length })
       
       await truffleAssert.reverts(deresyRequests.closeReviewRequest(requestName, { from: reviewerAddress1, value: 0 }))
       let request = await deresyRequests.getRequest(requestName)
@@ -234,11 +293,11 @@ contract('DeresyRequests', (accounts) => {
       let requestName = "CRR3"
       let reviewersArray = [reviewerAddress1, reviewerAddress3]
       let targetsArray = [target1, target2]
+      let targetsIPFSHashes = ["hash1", "hash2"]
       let ipfsHash = "hash"
       let reviewFormIndex = reviewFormsTotal - 1
-      await deresyRequests.createRequest(requestName, reviewersArray, targetsArray, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length })
+      await deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length })
       deresyRequests.closeReviewRequest(requestName, { from: ownerAddress, value: 0 })
-      
       await truffleAssert.reverts(deresyRequests.closeReviewRequest(requestName, { from: ownerAddress, value: 0 }))
       let request = await deresyRequests.getRequest(requestName)
       assert.equal(request.isClosed, true)
@@ -256,9 +315,10 @@ contract('DeresyRequests', (accounts) => {
       let requestName = "RRS1"
       let reviewersArray = [reviewerAddress1, reviewerAddress2, reviewerAddress3]
       let targetsArray = [target1, target2]
+      let targetsIPFSHashes = ["hash1", "hash2"]
       let ipfsHash = "hash"
       let reviewFormIndex = reviewFormsTotal - 1
-      await deresyRequests.createRequest(requestName, reviewersArray, targetsArray, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length })
+      await deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length })
       
       for (let i = 0; i < reviewersArray.length; i++) {
         for (let j = 0; j < targetsArray.length; j++) {
@@ -280,9 +340,10 @@ contract('DeresyRequests', (accounts) => {
       let requestName = "RRS2"
       let reviewersArray = [reviewerAddress1, reviewerAddress2, reviewerAddress3]
       let targetsArray = [target1, target2]
+      let targetsIPFSHashes = ["hash1", "hash2"]
       let ipfsHash = "hash"
       let reviewFormIndex = reviewFormsTotal - 1
-      await deresyRequests.createRequest(requestName, reviewersArray, targetsArray, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length })
+      await deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length })
       
       let targetIndex = 0
       let answersArray = ["Answer 1", "Yes"]
@@ -300,9 +361,10 @@ contract('DeresyRequests', (accounts) => {
       let requestName = "RRS3"
       let reviewersArray = [reviewerAddress1, reviewerAddress3]
       let targetsArray = [target1, target2]
+      let targetsIPFSHashes = ["hash1", "hash2"]
       let ipfsHash = "hash"
       let reviewFormIndex = reviewFormsTotal - 1
-      await deresyRequests.createRequest(requestName, reviewersArray, targetsArray, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length })
+      await deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length })
       
       let targetIndex = 0
       let answersArray = ["Answer 1", "Yes"]
@@ -318,10 +380,11 @@ contract('DeresyRequests', (accounts) => {
       let requestName = "RRS4"
       let reviewersArray = [reviewerAddress1, reviewerAddress2, reviewerAddress3]
       let targetsArray = [target1, target2]
+      let targetsIPFSHashes = ["hash1", "hash2"]
       let ipfsHash = "hash"
       let reviewFormIndex = reviewFormsTotal - 1
       
-      await deresyRequests.createRequest(requestName, reviewersArray, targetsArray, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length })
+      await deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length })
       await deresyRequests.closeReviewRequest(requestName, { from: ownerAddress, value: 0 })
 
       let targetIndex = 0
@@ -338,10 +401,11 @@ contract('DeresyRequests', (accounts) => {
       let requestName = "RRS5"
       let reviewersArray = [reviewerAddress1, reviewerAddress2, reviewerAddress3]
       let targetsArray = [target1, target2]
+      let targetsIPFSHashes = ["hash1", "hash2"]
       let ipfsHash = "hash"
       let reviewFormIndex = reviewFormsTotal - 1
       
-      await deresyRequests.createRequest(requestName, reviewersArray, targetsArray, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length })
+      await deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length })
 
       let targetIndex = 10
       let answersArray = ["Answer 1", "Yes"]
@@ -357,10 +421,11 @@ contract('DeresyRequests', (accounts) => {
       let requestName = "RRS6"
       let reviewersArray = [reviewerAddress1, reviewerAddress2, reviewerAddress3]
       let targetsArray = [target1, target2]
+      let targetsIPFSHashes = ["hash1", "hash2"]
       let ipfsHash = "hash"
       let reviewFormIndex = reviewFormsTotal - 1
       
-      await deresyRequests.createRequest(requestName, reviewersArray, targetsArray, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length })
+      await deresyRequests.createRequest(requestName, reviewersArray, targetsArray, targetsIPFSHashes, ipfsHash, rewardPerReview1, reviewFormIndex, { from: ownerAddress, value: rewardPerReview1 * reviewersArray.length * targetsArray.length })
       await deresyRequests.closeReviewRequest(requestName, { from: ownerAddress, value: 0 })
   
       let targetIndex = 0

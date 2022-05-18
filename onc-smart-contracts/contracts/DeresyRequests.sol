@@ -19,6 +19,7 @@ contract DeresyRequests {
     address sponsor;
     address[] reviewers;
     string[] targets;
+    string[] targetsIPFSHashes;
     string formIpfsHash;
     uint256 rewardPerReview;
     Review[] reviews;
@@ -45,9 +46,11 @@ contract DeresyRequests {
   }
 
   // Creating a request 
-  function createRequest(string memory _name, address[] memory reviewers, string[] memory targets, string memory formIpfsHash, uint256 rewardPerReview, uint256 reviewFormIndex) external payable{
+  function createRequest(string memory _name, address[] memory reviewers, string[] memory targets, string[] memory targetsIPFSHashes, string memory formIpfsHash, uint256 rewardPerReview, uint256 reviewFormIndex) external payable{
     require(reviewers.length > 0,"Deresy: Reviewers cannot be null");
     require(targets.length > 0,"Deresy: Targets cannot be null");
+    require(targetsIPFSHashes.length > 0, "Deresy: Targets IPFS hashes cannot be null");
+    require(targets.length == targetsIPFSHashes.length, "Deresy: Targets and targetsIPFSHashes array must have the same length");
     require(reviewFormIndex <= reviewForms.length - 1,"Deresy: ReviewFormIndex invalid");
     require(rewardPerReview > 0,"Deresy: rewardPerReview cannot be empty");
     require(reviewRequests[_name].sponsor == address(0),"Deresy: Name duplicated");
@@ -55,6 +58,7 @@ contract DeresyRequests {
     reviewRequests[_name].sponsor = msg.sender;
     reviewRequests[_name].reviewers = reviewers;
     reviewRequests[_name].targets = targets;
+    reviewRequests[_name].targetsIPFSHashes = targetsIPFSHashes;
     reviewRequests[_name].formIpfsHash = formIpfsHash;
     reviewRequests[_name].rewardPerReview = rewardPerReview;
     reviewRequests[_name].isClosed = false;
@@ -82,8 +86,9 @@ contract DeresyRequests {
     reviewRequests[_name].fundsLeft = 0;
   }
 
-  function getRequest(string memory _name) public view returns (address[] memory reviewers,string[] memory targets,string memory formIpfsHash,uint256 rewardPerReview,Review[] memory reviews,uint256 reviewFormIndex, bool isClosed){
-    return (reviewRequests[_name].reviewers,reviewRequests[_name].targets,reviewRequests[_name].formIpfsHash,reviewRequests[_name].rewardPerReview, reviewRequests[_name].reviews, reviewRequests[_name].reviewFormIndex, reviewRequests[_name].isClosed);
+  function getRequest(string memory _name) public view returns (address[] memory reviewers, string[] memory targets, string[] memory targetsIPFSHashes, string memory formIpfsHash, uint256 rewardPerReview,Review[] memory reviews, uint256 reviewFormIndex,bool isClosed){
+    ReviewRequest memory request = reviewRequests[_name];
+    return (request.reviewers, request.targets, request.targetsIPFSHashes, request.formIpfsHash, request.rewardPerReview, request.reviews, request.reviewFormIndex, request.isClosed);
   }
 
   function getReviewForm(uint256 _reviewFormIndex) public view returns(string[] memory, QuestionType[] memory){

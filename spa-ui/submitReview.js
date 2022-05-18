@@ -137,12 +137,13 @@ const submitReview = async () => {
             document.getElementById("submit-review-questions-wrapper").innerHTML = questionsHTML;
           } else {
             const requestTargets = reviewRequest.targets;
+            const requestTargetsIpfsHashes = reviewRequest.targetsIPFSHashes;
             const reviewFormIndex = reviewRequest.reviewFormIndex;
             const reviewForm = await contract.methods.getReviewForm(reviewFormIndex).call();
             const questions = reviewForm[0]
             const questionTypes = reviewForm[1]
             
-            questionsHTML = `<label>Target</label><div class="pure-g"><div class="pure-u-20-24"><select id="submit-review-target-index" class="pure-input-1"><option hidden selected value="">Select the target for your review</option><select/></div><div class="pure-u-20-24"><small id="submit-review-target-index-validation" class="validation-error"></small></div></div>`
+            questionsHTML = `<label>Target</label><div class="pure-g"><div class="pure-u-20-24"><select id="submit-review-target-index" class="pure-input-1"><option hidden selected value="">Select the target for your review</option><select/></div><div class="pure-u-20-24"><small id="submit-review-target-index-validation" class="validation-error"></small></div></div><div id="target-hash-div" style="display:none"><label>Target IPFS Hash</label><div id="target-ipfs-hash"></div></div>`
             
             questionTypes.forEach( (questionType,index) => {
               questionsHTML += questionType == 0 ?  createTextQuestion(questions[index]) : createCheckboxQuestion(questions[index], index);
@@ -153,6 +154,18 @@ const submitReview = async () => {
             for (let i = 0; i < requestTargets.length; i++) {
               targetIndexSelect.innerHTML += `<option value="${i}">${requestTargets[i]}</option>`;
             };
+
+            document.getElementById('submit-review-target-index').addEventListener('change', function() {
+              let targetIPFSHash = requestTargetsIpfsHashes[this.value]
+              if(targetIPFSHash) {
+                document.getElementById("target-ipfs-hash").innerHTML = `<a href="https://ifps.io/ipfs/${targetIPFSHash}" target="_blank">${targetIPFSHash}</a>`
+                document.getElementById("target-hash-div").style="display:block"
+              } else {
+                document.getElementById("target-ipfs-hash").innerHTML = ""
+                document.getElementById("target-hash-div").style="display:none"
+              }
+            });
+
             document.getElementById("submitReviewBtn").style = "display:block";
           }
           document.getElementById("submit-review-questions-wrapper").style = "display:block";

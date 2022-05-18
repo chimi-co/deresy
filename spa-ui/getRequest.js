@@ -39,7 +39,7 @@ const fillReviewsTable = (reviewForm, request) => {
       var reviewTd = document.createElement('td');
       reviewTr.appendChild(reviewTd);
       let reviewsText = "";
-      reviewsText += `<h3 style="margin:0% !important">Review ${index+1} by (${review.reviewer})</h3><br><strong>Target:</strong> ${request.targets[review.targetIndex]}<br><br>`
+      reviewsText += `<h3 style="margin:0% !important">Review ${index+1} by (${review.reviewer})</h3><br><strong>Target:</strong> <a href="${request.targets[review.targetIndex]}" target="_blank">${request.targets[review.targetIndex]}</a><br><strong>Target IPFS Hash: </strong><a href="https://ifps.io/ipfs/${request.targetsIPFSHashes[review.targetIndex]}" target="_blank">${request.targetsIPFSHashes[review.targetIndex]}</a><br>`
       review.answers.forEach((answer, index) =>{
         reviewsText += `<strong>${reviewForm[0][index]}</strong><br>${answer}<br><br>`
       });
@@ -61,8 +61,8 @@ const fillReviewRequestTable = (request) => {
     document.getElementById("request-info").style = "display: none";
     document.getElementById("requestReviewFormIndexTd").innerHTML = request.reviewFormIndex;
     document.getElementById("requestReviewersTd").innerHTML = request.reviewers.join('<br>');
-    document.getElementById("requestTargetsTd").innerHTML = request.targets.join('<br>');
-    document.getElementById("requestIpfsHashTd").innerHTML = request.formIpfsHash;
+    document.getElementById("requestTargetsTd").innerHTML = requestTargetsTdHtml(request);
+    document.getElementById("requestIpfsHashTd").innerHTML = `<a href="https://ifps.io/ipfs/${request.formIpfsHash}" target="_blank">${request.formIpfsHash}</a>`;
     document.getElementById("requestRewardTd").innerHTML = `${request.rewardPerReview/1000000000000000000} ETH`;
     document.getElementById("requestClosedTd").innerHTML = request.isClosed ? 'Yes' : 'No';
   } else {
@@ -72,6 +72,21 @@ const fillReviewRequestTable = (request) => {
     document.getElementById("request-table").style = "display: none";
   }
 };
+
+const requestTargetsTdHtml = (request) => {
+  let targets = request.targets;
+  let targetsHashes = request.targetsIPFSHashes;
+  let html = ''
+  console.log(targets)
+  console.log(targetsHashes)
+  targets.forEach((target, index) => {
+    html += `<strong>Target ${index + 1}: </strong> ${target}<br>`
+    if(targetsHashes[index]){
+      html += `<strong>Target ${index + 1} IPFS Hash: </strong> <a href="https://ifps.io/ipfs/${targetsHashes[index]}" target="_blank">${targetsHashes[index]}</a><br>`
+    }
+  })
+  return html;
+}
 
 const fillReviewFormTable = async (reviewForm) => {
   var reviewFormTable = document.getElementById("review-form-table");

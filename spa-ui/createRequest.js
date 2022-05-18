@@ -18,6 +18,8 @@ const createRequest = async () => {
       const reviewersValues = reviewers.map((o) => o.value);
       const targets = Array.prototype.slice.call(document.getElementsByName('targets[]'));
       const targetsValues = targets.map((o) => o.value);
+      const targetsIPFSHashes = Array.prototype.slice.call(document.getElementsByName('targetsIPFSHashes[]'));
+      const targetsIPFSHashesValues = targetsIPFSHashes.map((o) => o.value);
       const reviewFormIndex = document.getElementById("reviewFormIndex").value;
       const formIpfsHash = document.getElementById("ipfsHash").value;
       const rewardPerReview = document.getElementById("rewardPerReview").value;
@@ -33,6 +35,7 @@ const createRequest = async () => {
           _name,
           reviewersValues,
           targetsValues,
+          targetsIPFSHashesValues,
           formIpfsHash,
           rewardPerReviewToWei,
           reviewFormIndex,
@@ -145,9 +148,6 @@ const createRequest = async () => {
     reviewerFields.forEach(function(reviewer) {
       var validationMessage = reviewer.parentNode.parentNode.querySelector('.validation-error');
       if(reviewer.value){
-        console.log('reviewerValues', reviewerValues);
-        console.log('reviewer.value', reviewer.value);
-        console.log(reviewerValues.includes(reviewer.value));
         if(reviewerValues.includes(reviewer.value)){
           validationMessage.innerHTML = "Duplicated reviewer address";
           validationMessage.style = "display:block";
@@ -177,18 +177,46 @@ const createRequest = async () => {
   const addTargetInput = () => {
     var pureG = document.createElement('div');
     pureG.className = "pure-g";
-    var pureField = document.createElement('div');
-    pureField.className = "pure-u-20-24";
+    var pureLabelTargetField = document.createElement('div');
+    pureLabelTargetField.className = "pure-u-10-24";
+    var pureLabelSeparatorField = document.createElement('div');
+    pureLabelSeparatorField.className = "pure-u-1-24";
+    var pureLabelHashField = document.createElement('div');
+    pureLabelHashField.className = "pure-u-9-24";
+    var pureTargetField = document.createElement('div');
+    pureTargetField.className = "pure-u-10-24";
+    var pureSeparatorField = document.createElement('div');
+    pureSeparatorField.className = "pure-u-1-24";
+    var pureHashField = document.createElement('div');
+    pureHashField.className = "pure-u-9-24";
     var pureValidation = document.createElement('div');
     pureValidation.className = "pure-u-20-24";
-    pureG.appendChild(pureField);
+    pureG.appendChild(pureLabelTargetField);
+    pureG.appendChild(pureLabelSeparatorField);
+    pureG.appendChild(pureLabelHashField);
+    pureG.appendChild(pureTargetField);
+    pureG.appendChild(pureSeparatorField);
+    pureG.appendChild(pureHashField);
     
+    var targetLabel = document.createElement('label')
+    targetLabel.innerHTML = "Target"
     var targetInput = document.createElement('input')
     targetInput.className = "pure-input-1"
     targetInput.type = "text"
     targetInput.placeholder="Enter a target"
     targetInput.name="targets[]"
-    pureField.appendChild(targetInput)
+    pureLabelTargetField.appendChild(targetLabel)
+    pureTargetField.appendChild(targetInput)
+
+    var hashLabel = document.createElement('label')
+    hashLabel.innerHTML = "Target IPFS Hash"
+    var hashInput = document.createElement('input')
+    hashInput.className = "pure-input-1"
+    hashInput.type = "text"
+    hashInput.placeholder="Enter a target IPFS hash"
+    hashInput.name="targetsIPFSHashes[]"
+    pureLabelHashField.appendChild(hashLabel)
+    pureHashField.appendChild(hashInput)
     
     var pureRemove = document.createElement('div');
     pureRemove.className = "pure-u-1-6";

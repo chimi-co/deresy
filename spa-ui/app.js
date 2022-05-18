@@ -57,6 +57,11 @@ const abi = [
         "type": "string[]"
       },
       {
+        "internalType": "string[]",
+        "name": "targetsIPFSHashes",
+        "type": "string[]"
+      },
+      {
         "internalType": "string",
         "name": "formIpfsHash",
         "type": "string"
@@ -132,6 +137,11 @@ const abi = [
       {
         "internalType": "string[]",
         "name": "targets",
+        "type": "string[]"
+      },
+      {
+        "internalType": "string[]",
+        "name": "targetsIPFSHashes",
         "type": "string[]"
       },
       {
@@ -220,11 +230,11 @@ const abi = [
     "type": "function",
     "constant": true
   }
-]
+];
 
 let account;
 let web3;
-const contractAddress = "0x0244b1FB1b911C489af2a8A4D2df8d8489C49866";
+const contractAddress = "0x1169Be765C03D8Aac02Eb1047eEe59386e86aB75";
 
 const handleAccountsChanged = (accounts) => {
   if (accounts.length === 0) {
