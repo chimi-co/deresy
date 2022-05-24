@@ -39,7 +39,7 @@ const fillReviewsTable = (reviewForm, request) => {
       var reviewTd = document.createElement('td');
       reviewTr.appendChild(reviewTd);
       let reviewsText = "";
-      reviewsText += `<h3 style="margin:0% !important">Review ${index+1} by (${review.reviewer})</h3><br><strong>Target:</strong> <a href="${request.targets[review.targetIndex]}" target="_blank">${request.targets[review.targetIndex]}</a><br><strong>Target IPFS Hash: </strong><a href="https://ifps.io/ipfs/${request.targetsIPFSHashes[review.targetIndex]}" target="_blank">${request.targetsIPFSHashes[review.targetIndex]}</a><br>`
+      reviewsText += `<h3 style="margin:0% !important">Review ${index+1} by (${review.reviewer})</h3><br><strong>Target</strong><br><a href="${request.targets[review.targetIndex]}" target="_blank">${request.targets[review.targetIndex]}</a><br><br><strong>Target IPFS Hash</strong><br><a href="https://ifps.io/ipfs/${request.targetsIPFSHashes[review.targetIndex]}" target="_blank">${request.targetsIPFSHashes[review.targetIndex]}</a><br><br>`
       review.answers.forEach((answer, index) =>{
         reviewsText += `<strong>${reviewForm[0][index]}</strong><br>${answer}<br><br>`
       });
@@ -80,10 +80,11 @@ const requestTargetsTdHtml = (request) => {
   console.log(targets)
   console.log(targetsHashes)
   targets.forEach((target, index) => {
-    html += `<strong>Target ${index + 1}: </strong> ${target}<br>`
+    html += `<strong>Target ${index + 1} </strong> <br><a href="${target}" target="_blank">${target}</a><br>`
     if(targetsHashes[index]){
-      html += `<strong>Target ${index + 1} IPFS Hash: </strong> <a href="https://ifps.io/ipfs/${targetsHashes[index]}" target="_blank">${targetsHashes[index]}</a><br>`
+      html += `<strong>Target ${index + 1} IPFS Hash </strong><br> <a href="https://ifps.io/ipfs/${targetsHashes[index]}" target="_blank">${targetsHashes[index]}</a><br>`
     }
+    html += '<br>'
   })
   return html;
 }
