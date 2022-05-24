@@ -2,11 +2,16 @@
 pragma solidity 0.8.13;
 contract DeresyRequests {
     
-  enum QuestionType {Text, Checkbox}
+  enum QuestionType {Text, Checkbox, SingleChoice}
     
   struct reviewForm {
-    string[] questions;
+    Question[] questions;
     QuestionType[] questionTypes;
+  }
+
+  struct Question {
+    string questionText;
+    string[] choices; //define max number of options?
   }
 
   struct Review {
@@ -32,11 +37,13 @@ contract DeresyRequests {
 
   string[] reviewRequestNames;
   uint256 public reviewFormsTotal;
+  
+  string public contractVersion = "0.1";
 
   reviewForm[] reviewForms;
 
   //creating ReviewForm
-  function createReviewForm(string[] memory questions, QuestionType[] memory questionTypes) external  returns (uint256){
+  function createReviewForm(Question[] memory questions, QuestionType[] memory questionTypes) external  returns (uint256){
     require(questions.length > 0, "Deresy: Questions can't be null");
     require(questionTypes.length > 0, "Deresy: Question Types can't be null");
     require(questionTypes.length == questions.length, "Deresy: Needs to be the same quantity of parameters");
@@ -73,6 +80,7 @@ contract DeresyRequests {
     require(reviewForms[reviewRequests[_name].reviewFormIndex].questions.length == answers.length,"Deresy: Not the same number of questions and answers");
     require(isReviewer(msg.sender, _name) == true, "This address is not in the reviewers list for the specified request.");
     require(hasSubmittedReview(msg.sender, _name, targetIndex), "This address has already submitted a review for the targte index in the specified request");      
+    // validate answer is <= choices.length
     reviewRequests[_name].reviews.push(Review(msg.sender,targetIndex, answers));
     reviewRequests[_name].fundsLeft -= reviewRequests[_name].rewardPerReview;
     payable(msg.sender).transfer(reviewRequests[_name].rewardPerReview);
@@ -91,7 +99,7 @@ contract DeresyRequests {
     return (request.reviewers, request.targets, request.targetsIPFSHashes, request.formIpfsHash, request.rewardPerReview, request.reviews, request.reviewFormIndex, request.isClosed);
   }
 
-  function getReviewForm(uint256 _reviewFormIndex) public view returns(string[] memory, QuestionType[] memory){
+  function getReviewForm(uint256 _reviewFormIndex) public view returns(Question[] memory, QuestionType[] memory){
     return (reviewForms[_reviewFormIndex].questions,reviewForms[_reviewFormIndex].questionTypes);
   }
 
