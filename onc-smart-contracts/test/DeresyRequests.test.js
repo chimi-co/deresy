@@ -22,8 +22,9 @@ contract('DeresyRequests', (accounts) => {
   describe('Create Review Form', async () => {
     it("should create a review form if data is correct", async () => {
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
-      await truffleAssert.passes(deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 }))
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await truffleAssert.passes(deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 }))
       let formsCount = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
       let reviewForm = await deresyRequests.getReviewForm(formsCount - 1)
       assert.deepEqual(questionsArray, reviewForm[0])
@@ -32,28 +33,39 @@ contract('DeresyRequests', (accounts) => {
 
     it("should revert if questions array is empty", async () => {
       let questionsArray = []
-      let questionTypesArray = [0, 1]
-      await truffleAssert.reverts(deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 }))
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await truffleAssert.reverts(deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 }))
     })
 
     it("should revert if questionTypes array is empty", async () => {
       let questionsArray = ["Q1", "Q2"]
       let questionTypesArray = []
-      await truffleAssert.reverts(deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 }))
+      let choicesArray = [["choice1", "choice2"], []]
+      await truffleAssert.reverts(deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 }))
     })
 
     it("should revert if questions and questionTypes arrays have different lengths", async () => {
       let questionsArray = ["Q1", "Q2","Q3"]
-      let questionTypesArray = [0, 1]
-      await truffleAssert.reverts(deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 }))
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], [], []]
+      await truffleAssert.reverts(deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 }))
+    })
+
+    it("should revert if questions and choices arrays have different lengths", async () => {
+      let questionsArray = ["Q1", "Q2","Q3"]
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"]]
+      await truffleAssert.reverts(deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 }))
     })
 
     it("should increment reviewFormsTotal value each time a new form is created", async () => {
       let formsCount = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
       for (let i = 0; i < 5; i++) {
-        await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+        await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
         formsCount += 1
         let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
         assert.equal(reviewFormsTotal, formsCount)
@@ -65,8 +77,9 @@ contract('DeresyRequests', (accounts) => {
   describe('Create Review Request', async () => {
     it("should create a review request if data is correct", async () => {
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
-      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
       let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
 
       let requestName = "RRC1"
@@ -89,8 +102,9 @@ contract('DeresyRequests', (accounts) => {
 
     it("should revert if addresses array is null", async () => {
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
-      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
       let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
 
       let requestName = "RRC2"
@@ -105,8 +119,9 @@ contract('DeresyRequests', (accounts) => {
 
     it("should revert if targets array is null", async () => {
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
-      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
       let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
 
       let requestName = "RRC3"
@@ -132,8 +147,9 @@ contract('DeresyRequests', (accounts) => {
 
     it("should revert if rewardPerReview <= 0", async () => {
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
-      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
       let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
 
       let requestName = "RRC5"
@@ -148,8 +164,9 @@ contract('DeresyRequests', (accounts) => {
 
     it("should revert if name is duplicated", async () => {
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
-      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
       let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
 
       let requestName = "RRC6"
@@ -165,8 +182,9 @@ contract('DeresyRequests', (accounts) => {
 
     it("should revert if msg.value is invalid", async () => {
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
-      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
       let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
 
       let requestName = "RRC7"
@@ -181,8 +199,9 @@ contract('DeresyRequests', (accounts) => {
 
     it("should pass if ipfsHash is empty", async () => {
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
-      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
       let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
 
       let requestName = "RRC8"
@@ -197,8 +216,9 @@ contract('DeresyRequests', (accounts) => {
 
     it("should revert if targetsIPFSHashes array is empty", async () => {
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
-      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
       let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
 
       let requestName = "RRC9"
@@ -213,8 +233,9 @@ contract('DeresyRequests', (accounts) => {
 
     it("should revert if targetsIPFSHashes and targets arrays have different length", async () => {
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
-      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
       let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
 
       let requestName = "RRC10"
@@ -229,8 +250,9 @@ contract('DeresyRequests', (accounts) => {
 
     it("should pass if targetsIPFSHashes array contains empty strings", async () => {
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
-      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
       let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
 
       let requestName = "RRC10"
@@ -248,8 +270,9 @@ contract('DeresyRequests', (accounts) => {
   describe('Close Review Request', async () => {
     it("should close a review request if data is correct", async () => {
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
-      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
       let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
 
       let requestName = "CRR1"
@@ -267,8 +290,9 @@ contract('DeresyRequests', (accounts) => {
 
     it("should revert if sender is not owner", async () => {
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
-      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
       let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
 
       let requestName = "CRR2"
@@ -286,8 +310,9 @@ contract('DeresyRequests', (accounts) => {
 
     it("should revert if is closed", async () => {
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
-      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
       let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
 
       let requestName = "CRR3"
@@ -308,8 +333,9 @@ contract('DeresyRequests', (accounts) => {
   describe('Submit Review', async () => {
     it("should submit reviews if data is correct", async () => {
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
-      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
       let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
 
       let requestName = "RRS1"
@@ -333,8 +359,9 @@ contract('DeresyRequests', (accounts) => {
 
     it("should revert if reviewer submits review 2 times for the same target", async () => {
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
-      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
       let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
 
       let requestName = "RRS2"
@@ -354,8 +381,9 @@ contract('DeresyRequests', (accounts) => {
 
     it("should revert if submit address is not a reviewer", async () => {
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
-      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
       let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
 
       let requestName = "RRS3"
@@ -373,8 +401,9 @@ contract('DeresyRequests', (accounts) => {
 
     it("should revert if review request is closed", async () => {
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
-      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
       let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
 
       let requestName = "RRS4"
@@ -394,8 +423,9 @@ contract('DeresyRequests', (accounts) => {
 
     it("should revert if review targetIndex is invalid", async () => {
       let questionsArray = ["Q1", "Q2"]
-      let questionTypesArray = [0, 1]
-      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let questionTypesArray = [2, 1]
+      let choicesArray = [["choice1", "choice2"], []]
+      await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
       let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
 
       let requestName = "RRS5"
@@ -415,7 +445,8 @@ contract('DeresyRequests', (accounts) => {
     it("should revert if answersArray length is different from review form questionsArray", async () => {
       let questionsArray = ["Q1", "Q2"]
       let questionTypesArray = [0, 1]
-      await deresyRequests.createReviewForm(questionsArray, questionTypesArray, { from: ownerAddress, value: 0 })
+      let choicesArray = [["choice1", "choice2"], []]
+      await deresyRequests.createReviewForm(questionsArray, choicesArray, questionTypesArray, { from: ownerAddress, value: 0 })
       let reviewFormsTotal = await deresyRequests.reviewFormsTotal().then(b => { return b.toNumber() })
   
       let requestName = "RRS6"

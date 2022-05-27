@@ -21,10 +21,13 @@ const getReviewForm = async () => {
             var rFormTr = document.createElement('tr');
             var rFormQuestionTd = document.createElement('td');
             var rFormQuestionTypeTd = document.createElement('td');
+            var rFormChoiceTd = document.createElement('td');
             rFormTr.appendChild(rFormQuestionTd);
             rFormTr.appendChild(rFormQuestionTypeTd);
+            rFormTr.appendChild(rFormChoiceTd);
             rFormQuestionTd.innerHTML = question;
-            rFormQuestionTypeTd.innerHTML = reviewForm[1][index] == 0 ? 'Text' : 'Checkbox';
+            rFormQuestionTypeTd.innerHTML = reviewForm[1][index] == 0 ? 'Text' : reviewForm[1][index] == 1 ? 'Yes/No' : 'Single Choice';
+            rFormChoiceTd.innerHTML= reviewForm[2][index].join('<br>');
             rfTbody.appendChild(rFormTr);
           });
         } catch {

@@ -77,8 +77,6 @@ const requestTargetsTdHtml = (request) => {
   let targets = request.targets;
   let targetsHashes = request.targetsIPFSHashes;
   let html = ''
-  console.log(targets)
-  console.log(targetsHashes)
   targets.forEach((target, index) => {
     html += `<strong>Target ${index + 1} </strong> <br><a href="${target}" target="_blank">${target}</a><br>`
     if(targetsHashes[index]){
@@ -97,10 +95,13 @@ const fillReviewFormTable = async (reviewForm) => {
     var rFormTr = document.createElement('tr');
     var rFormQuestionTd = document.createElement('td');
     var rFormQuestionTypeTd = document.createElement('td');
+    var rFormChoiceTd = document.createElement('td');
     rFormTr.appendChild(rFormQuestionTd);
     rFormTr.appendChild(rFormQuestionTypeTd);
+    rFormTr.appendChild(rFormChoiceTd);
     rFormQuestionTd.innerHTML = question;
-    rFormQuestionTypeTd.innerHTML = reviewForm[1][index] == 0 ? 'Text' : 'Checkbox';
+    rFormQuestionTypeTd.innerHTML = reviewForm[1][index] == 0 ? 'Text' : reviewForm[1][index] == 1 ? 'Yes/No' : 'Single Choice';
+    rFormChoiceTd.innerHTML= reviewForm[2][index].join('<br>');
     rfTbody.appendChild(rFormTr);
   });
   reviewFormTable.style = "display: block;margin-top: 5%;";

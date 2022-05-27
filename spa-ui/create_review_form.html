@@ -14,6 +14,7 @@
         <a class="pure-menu-heading" href="./">DERESY</a>
   
         <ul class="pure-menu-list">
+          <li class="pure-menu-item" style="padding-right: 100px;"><div class="pure-menu-text"><strong id="contractVersion"></strong></div></li>
           <li class="pure-menu-item"><div class="pure-menu-text" id="enableMM"></div></li>
           <li class="pure-menu-item" style="margin: 0px 20px 0px 10px">
             <button id="connectBtn" class="pure-button pure-button-primary" style="display:none">Connect</button>
@@ -43,10 +44,11 @@
                   </div>
                   <div class="pure-u-1-24"></div>
                   <div class="pure-u-1-3">
-                    <select name="question-types[]" class="pure-input-1">
+                    <select name="question-types[]" id="question-type-selector" class="pure-input-1">
                       <option hidden selected value="">Select a type</option>
                       <option value="0">Text</option>
-                      <option value="1">Checkbox</option>
+                      <option value="1">Yes/No</option>
+                      <option value="2">Single Choice</option>
                     </select>
                   </div>
                   <div class="pure-u-1-6"></div>

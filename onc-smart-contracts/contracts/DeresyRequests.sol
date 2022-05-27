@@ -1,17 +1,13 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.13;
+pragma solidity 0.8.14;
 contract DeresyRequests {
     
   enum QuestionType {Text, Checkbox, SingleChoice}
     
   struct reviewForm {
-    Question[] questions;
+    string[] questions;
     QuestionType[] questionTypes;
-  }
-
-  struct Question {
-    string questionText;
-    string[] choices; //define max number of options?
+    string[][] choices;
   }
 
   struct Review {
@@ -43,11 +39,12 @@ contract DeresyRequests {
   reviewForm[] reviewForms;
 
   //creating ReviewForm
-  function createReviewForm(Question[] memory questions, QuestionType[] memory questionTypes) external  returns (uint256){
+  function createReviewForm(string[] memory questions, string[][] memory choices, QuestionType[] memory questionTypes) external  returns (uint256){
     require(questions.length > 0, "Deresy: Questions can't be null");
     require(questionTypes.length > 0, "Deresy: Question Types can't be null");
-    require(questionTypes.length == questions.length, "Deresy: Needs to be the same quantity of parameters");
-    reviewForms.push(reviewForm(questions,questionTypes));
+    require(questionTypes.length == questions.length, "Deresy: Questions and types must have the same length");
+    require(questions.length == choices.length, "Deresy: Questions and choices must have the same length");
+    reviewForms.push(reviewForm(questions,questionTypes, choices));
     reviewFormsTotal += 1;
     return reviewForms.length - 1;
   }
@@ -99,8 +96,8 @@ contract DeresyRequests {
     return (request.reviewers, request.targets, request.targetsIPFSHashes, request.formIpfsHash, request.rewardPerReview, request.reviews, request.reviewFormIndex, request.isClosed);
   }
 
-  function getReviewForm(uint256 _reviewFormIndex) public view returns(Question[] memory, QuestionType[] memory){
-    return (reviewForms[_reviewFormIndex].questions,reviewForms[_reviewFormIndex].questionTypes);
+  function getReviewForm(uint256 _reviewFormIndex) public view returns(string[] memory, QuestionType[] memory, string[][] memory choices){
+    return (reviewForms[_reviewFormIndex].questions,reviewForms[_reviewFormIndex].questionTypes, reviewForms[_reviewFormIndex].choices);
   }
 
   function getReviewRequestsNames() public view returns(string[] memory){

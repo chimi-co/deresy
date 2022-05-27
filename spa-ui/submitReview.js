@@ -142,11 +142,18 @@ const submitReview = async () => {
             const reviewForm = await contract.methods.getReviewForm(reviewFormIndex).call();
             const questions = reviewForm[0]
             const questionTypes = reviewForm[1]
+            const choices = reviewForm[2]
             
             questionsHTML = `<label>Target</label><div class="pure-g"><div class="pure-u-20-24"><select id="submit-review-target-index" class="pure-input-1"><option hidden selected value="">Select the target for your review</option><select/></div><div class="pure-u-20-24"><small id="submit-review-target-index-validation" class="validation-error"></small></div></div><div id="target-hash-div" style="display:none"><label>Target IPFS Hash</label><div id="target-ipfs-hash"></div></div>`
             
             questionTypes.forEach( (questionType,index) => {
-              questionsHTML += questionType == 0 ?  createTextQuestion(questions[index]) : createCheckboxQuestion(questions[index], index);
+              if(questionType == 0) {
+                questionsHTML += createTextQuestion(questions[index]);
+              } else if (questionType == 1) {
+                questionsHTML += createCheckboxQuestion(questions[index], index);
+              } else if(questionType == 2){
+                questionsHTML += createSingleChoiceQuestion(questions[index], choices[index], index);
+              }
             });
 
             document.getElementById("submit-review-questions-wrapper").innerHTML = questionsHTML;
@@ -202,6 +209,15 @@ const submitReview = async () => {
     let questionHTML = `<label>${question}</label><div class="pure-g"><div class="pure-u-10-24"><label for="radio-1-${index}" class="pure-checkbox""><input type="radio" class="submit-review-answers" name="checkbox-answers-${index}" id="radio-1-${index}" value="Yes" style="width:20px !important" checked />Yes</label></div><div class="pure-u-10-24"><label for="radio-2-${index}" class="pure-checkbox"><input type="radio" name="checkbox-answers-${index}" class="submit-review-answers" id="radio-2-${index}" value="No" style="width:20px !important"/>No</label></div><div class="pure-u-20-24"><small class="validation-error"></small></div></div><br/>`;
     return questionHTML;
   };
+
+  function createSingleChoiceQuestion(question, choices, index) {
+    let questionHTML = `<label>${question}</label><div class="pure-g">`;
+    for (let i = 0; i < choices.length; i++) {
+      questionHTML += `<div class="pure-u-8-24"><label for="radio-${i}-${index}" class="pure-checkbox""><input type="radio" class="submit-review-answers" name="checkbox-answers-${index}" id="radio-${i}-${index}" value="${choices[i]}" style="width:20px !important" checked />${choices[i]}</label></div>`;
+    }
+    questionHTML += '<div class="pure-u-20-24"><small class="validation-error"></small></div></div><br/>'
+    return questionHTML;
+  }
 
   const populateReviewRequestNameSelect = async () => {
     if (account) {

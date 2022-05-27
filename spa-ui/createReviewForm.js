@@ -18,13 +18,23 @@ const createReviewForm = async () => {
       const questionTypes = Array.prototype.slice.call(document.getElementsByName('question-types[]'));
       const questionTypesValues = questionTypes.map((o) => o.value);
       
-      
+      let questionsChoicesValues = []
+      questions.forEach((question, index) => {
+        let choicesValues = []
+        if(questionTypesValues[index] == 2){
+          let questionChoices = Array.prototype.slice.call(question.parentElement.parentElement.querySelectorAll('[name="choices[]"]'))
+          choicesValues = questionChoices.map((o) => o.value);
+        }
+        questionsChoicesValues.push(choicesValues);
+      })
+
       const validData = validateCreateReviewForm();
 
       if(validData) {
         const data = await contract.methods
         .createReviewForm(
           questionsValues,
+          questionsChoicesValues,
           questionTypesValues,
           )
           .encodeABI();
@@ -64,11 +74,12 @@ const createReviewForm = async () => {
     }
   };
   
-  const validateCreateReviewForm = (name, targetIndex, hash) => {
+  const validateCreateReviewForm = () => {
     let validQuestions = false;
     let validQuestionTypes = false;
+    let validQuestionChoices = false;
     
-    questionFields = document.getElementsByName('questions[]');
+    let questionFields = document.getElementsByName('questions[]');
     
     questionFields.forEach(function(question) {
       var validationMessage = question.parentNode.parentNode.querySelector('.question-validation');
@@ -82,7 +93,7 @@ const createReviewForm = async () => {
       }
     });
     
-    questionTypeFields = document.getElementsByName('question-types[]');
+    let questionTypeFields = document.getElementsByName('question-types[]');
     
     questionTypeFields.forEach(function(questionType) {
       var validationMessage = questionType.parentNode.parentNode.querySelector('.question-type-validation');
@@ -95,8 +106,84 @@ const createReviewForm = async () => {
         validQuestionTypes = false;
       }
     });
+
+    let questionChoices = document.getElementsByName('choices[]');
+
+    questionChoices.forEach(function(choice, index){
+      var validationMessage = choice.parentNode.parentNode.querySelector('.choice-validation');
+      if(choice.value && questionTypeFields){
+        validationMessage.style = "display:none";
+        validQuestionChoices = true;
+      } else {
+        validationMessage.innerHTML = "This is a required field";
+        validationMessage.style = "display:block";
+        validQuestionChoices = false;
+      }
+    });
     
-    return validQuestions && validQuestionTypes;
+    return validQuestions && validQuestionTypes && validQuestionChoices;
+  };
+
+  const questionTypeSelected = (selector, typeValue) => {
+    const questionWrapper = selector.parentNode.parentNode;
+    if(typeValue == 2) {
+      var scQuestionWrapper = document.createElement('div');
+      scQuestionWrapper.className = "pure-u-1 single-choice-question-wrapper";
+      var scChoicesWrapper = document.createElement('div');
+      scChoicesWrapper.className = "pure-u-1 single-choice-choices-wrapper";
+      scQuestionWrapper.appendChild(scChoicesWrapper);
+      questionWrapper.appendChild(scQuestionWrapper);
+
+      var choice1PureG = document.createElement('div')
+      choice1PureG.className = "pure-g"
+      var choice1Div = document.createElement('div')
+      choice1Div.className = "pure-u-19-24"
+      var choice1Validation = document.createElement('div')
+      choice1Validation.className = "pure-u-19-24"
+      var choice2PureG = document.createElement('div')
+      choice2PureG.className = "pure-g"
+      var choice2Div = document.createElement('div')
+      choice2Div.className = "pure-u-19-24"
+      var choice2Validation = document.createElement('div')
+      choice2Validation.className = "pure-u-19-24"
+      var choiceInput1 = document.createElement('input')
+      choiceInput1.className = "pure-input-1"
+      choiceInput1.type = "text"
+      choiceInput1.placeholder="Enter the choice text"
+      choiceInput1.name="choices[]"
+      var choice1ValidationMessage = document.createElement('small')
+      choice1ValidationMessage.className = "validation-error choice-validation"
+      var choiceInput2 = document.createElement('input')
+      choiceInput2.className = "pure-input-1"
+      choiceInput2.type = "text"
+      choiceInput2.placeholder="Enter the choice text"
+      choiceInput2.name="choices[]"
+      var choice2ValidationMessage = document.createElement('small')
+      choice2ValidationMessage.className = "validation-error choice-validation"
+
+      choice1Div.appendChild(choiceInput1)
+      choice2Div.appendChild(choiceInput2)
+      choice1Validation.appendChild(choice1ValidationMessage)
+      choice2Validation.appendChild(choice2ValidationMessage)
+      choice1PureG.appendChild(choice1Div)
+      choice2PureG.appendChild(choice2Div)
+      choice1PureG.appendChild(choice1Validation)
+      choice2PureG.appendChild(choice2Validation)
+      scChoicesWrapper.appendChild(choice1PureG);
+      scChoicesWrapper.appendChild(choice2PureG);
+      
+      var choicesBtn = document.createElement('button');
+      choicesBtn.className = "pure-button button-warning"
+      choicesBtn.onclick = function() { addQuestionChoice(this) };
+      choicesBtn.type = "button";
+      choicesBtn.innerHTML = "Add Choice";
+      scQuestionWrapper.appendChild(choicesBtn);
+    } else {
+      var scQuestionWrapper = questionWrapper.querySelector(".single-choice-question-wrapper");
+      if(scQuestionWrapper){
+        scQuestionWrapper.remove();
+      }
+    }
   };
 
   const addQuestion = () => {
@@ -162,6 +249,7 @@ const createReviewForm = async () => {
     var questionTypeSelect = document.createElement('select')
     questionTypeSelect.className = "pure-input-1"
     questionTypeSelect.name = "question-types[]"
+    questionTypeSelect.onchange = function() { questionTypeSelected(questionTypeSelect, this.value) }
     var selectPlaceholder = document.createElement('option')
     selectPlaceholder.innerHTML = "Select a question type"
     selectPlaceholder.hidden = true
@@ -171,11 +259,15 @@ const createReviewForm = async () => {
     selectOpt1.innerHTML = "Text"
     selectOpt1.value = "0"
     var selectOpt2 = document.createElement('option')
-    selectOpt2.innerHTML = "Checkbox"
+    selectOpt2.innerHTML = "Yes/No"
     selectOpt2.value = "1"
+    var selectOpt3 = document.createElement('option')
+    selectOpt3.innerHTML = "Single Choice"
+    selectOpt3.value = "2"
     questionTypeSelect.appendChild(selectPlaceholder)
     questionTypeSelect.appendChild(selectOpt1)
     questionTypeSelect.appendChild(selectOpt2)
+    questionTypeSelect.appendChild(selectOpt3)
     pureQuestionTypeFieldLabel.appendChild(questionTypeLabel)
     pureQuestionTypeField.appendChild(questionTypeSelect)
     
@@ -197,6 +289,46 @@ const createReviewForm = async () => {
     document.getElementById("questionWrapper").appendChild(pureG);
   };
 
+  const addQuestionChoice = (selector) => {
+    let choicesWrapper = selector.parentNode.parentNode.querySelector(".single-choice-choices-wrapper")
+    var pureG = document.createElement('div');
+    pureG.className = "pure-g";
+
+    var pureChoiceField = document.createElement('div');
+    pureChoiceField.className = "pure-u-19-24";
+    var pureSeparator = document.createElement('div');
+    pureSeparator.className = "pure-u-1-24";
+    var pureRemove = document.createElement('div');
+    pureRemove.className = "pure-u-1-6";
+    var choiceValidationDiv = document.createElement('div');
+    choiceValidationDiv.className = "pure-u-19-24";
+
+    var questionChoiceInput = document.createElement('input');
+    questionChoiceInput.className = "pure-input-1";
+    questionChoiceInput.type = "text";
+    questionChoiceInput.placeholder="Enter the choice text";
+    questionChoiceInput.name="choices[]";
+    pureChoiceField.appendChild(questionChoiceInput);
+
+    var choiceValidationMessage = document.createElement('small');
+    choiceValidationMessage.className = "validation-error choice-validation";
+    choiceValidationDiv.appendChild(choiceValidationMessage);
+
+    var questionRemove = document.createElement('button');
+    questionRemove.className = "button-error pure-button"
+    questionRemove.onclick = function() { pureG.remove() };
+    questionRemove.type = "button";
+    questionRemove.innerHTML = "X";
+    pureRemove.appendChild(questionRemove);
+
+    pureG.appendChild(pureChoiceField);
+    pureG.appendChild(pureSeparator);
+    pureG.appendChild(pureRemove);
+    pureG.appendChild(choiceValidationDiv);
+
+    choicesWrapper.appendChild(pureG);
+  };
+
   function removeElement(element) {
     element.remove();
   };
@@ -210,6 +342,10 @@ const createReviewForm = async () => {
     document
     .getElementById("createReviewFormBtn")
     .addEventListener("click", createReviewForm);
+
+    document
+    .getElementById("question-type-selector")
+    .addEventListener('change', function() { questionTypeSelected(this, this.value) });
     
     document.getElementById("addQuestionBtn").addEventListener("click", addQuestion);
   };
