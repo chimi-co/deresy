@@ -1,6 +1,21 @@
 const ARBITRUM_NETWORK_ID = 421611;
+let contractVersion = 0
 
 const abi = [
+  {
+    "inputs": [],
+    "name": "contractVersion",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
   {
     "inputs": [],
     "name": "reviewFormsTotal",
@@ -21,6 +36,11 @@ const abi = [
         "internalType": "string[]",
         "name": "questions",
         "type": "string[]"
+      },
+      {
+        "internalType": "string[][]",
+        "name": "choices",
+        "type": "string[][]"
       },
       {
         "internalType": "enum DeresyRequests.QuestionType[]",
@@ -210,6 +230,11 @@ const abi = [
         "internalType": "enum DeresyRequests.QuestionType[]",
         "name": "",
         "type": "uint8[]"
+      },
+      {
+        "internalType": "string[][]",
+        "name": "choices",
+        "type": "string[][]"
       }
     ],
     "stateMutability": "view",
@@ -234,7 +259,7 @@ const abi = [
 
 let account;
 let web3;
-const contractAddress = "0x1169Be765C03D8Aac02Eb1047eEe59386e86aB75";
+const contractAddress = "0xD1472423863A07330253eD67d11ADF53322Abc57";
 
 const handleAccountsChanged = (accounts) => {
   if (accounts.length === 0) {
@@ -284,6 +309,14 @@ const handleNetworkMessage = (chainId) => {
     networkAlert.style = "display:block"
   }
 };
+
+const getContractVersion = async  () => {
+  const contract = new web3.eth.Contract(abi, contractAddress, {
+    from: account,
+  });
+  const contractVersion = await contract.methods.contractVersion().call();
+  document.getElementById('contractVersion').innerHTML = `Version: ${contractVersion}`
+};
       
 const detectMetaMask = () => typeof window.ethereum !== "undefined";
       
@@ -296,7 +329,8 @@ window.onload = async function () {
       await connect();
       ethereum.
       request({ method: "eth_chainId" })
-      .then(handleNetworkMessage);
+      .then(handleNetworkMessage)
+      .then(getContractVersion);
     } catch (error) {
       console.log(error);
     }
