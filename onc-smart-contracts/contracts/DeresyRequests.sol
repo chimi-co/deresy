@@ -38,6 +38,11 @@ contract DeresyRequests {
 
   reviewForm[] reviewForms;
 
+  event CreatedReviewForm(uint256 _formId);
+  event CreatedReviewRequest(string _requestName);
+  event ClosedReviewRequest(string _requestName);
+  event SubmittedReview(string _requestName);
+
   //creating ReviewForm
   function createReviewForm(string[] memory questions, string[][] memory choices, QuestionType[] memory questionTypes) external  returns (uint256){
     require(questions.length > 0, "Deresy: Questions can't be null");
@@ -46,7 +51,7 @@ contract DeresyRequests {
     require(questions.length == choices.length, "Deresy: Questions and choices must have the same length");
     reviewForms.push(reviewForm(questions,questionTypes, choices));
     reviewFormsTotal += 1;
-    return reviewForms.length - 1;
+    emit CreatedReviewForm(reviewForms.length - 1);
   }
 
   // Creating a request 
@@ -69,6 +74,7 @@ contract DeresyRequests {
     reviewRequests[_name].fundsLeft = msg.value;
     reviewRequests[_name].reviewFormIndex = reviewFormIndex;
     reviewRequestNames.push(_name);
+    emit CreatedReviewRequest(_name);
   }
 
   function submitReview(string memory _name, uint8 targetIndex, string[] memory answers) external {
@@ -81,6 +87,7 @@ contract DeresyRequests {
     reviewRequests[_name].reviews.push(Review(msg.sender,targetIndex, answers));
     reviewRequests[_name].fundsLeft -= reviewRequests[_name].rewardPerReview;
     payable(msg.sender).transfer(reviewRequests[_name].rewardPerReview);
+    emit SubmittedReview(_name);
   }
 
   function closeReviewRequest(string memory _name) external{
@@ -89,6 +96,7 @@ contract DeresyRequests {
     payable(reviewRequests[_name].sponsor).transfer(reviewRequests[_name].fundsLeft);
     reviewRequests[_name].isClosed = true;
     reviewRequests[_name].fundsLeft = 0;
+    emit ClosedReviewRequest(_name);
   }
 
   function getRequest(string memory _name) public view returns (address[] memory reviewers, string[] memory targets, string[] memory targetsIPFSHashes, string memory formIpfsHash, uint256 rewardPerReview,Review[] memory reviews, uint256 reviewFormIndex,bool isClosed){
