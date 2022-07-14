@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="app.css" type="text/css">
+    <script src="app.js" type="text/javascript"></script>
+    <title>DERESY</title>
+  </head>
+  <body>
+    <div class="header">
+      <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
+        <a class="pure-menu-heading" href="">DERESY</a>
+  
+        <ul class="pure-menu-list">
+          <li class="pure-menu-item"><div class="pure-menu-text" id="enableMM"></div></li>
+          <li class="pure-menu-item" style="margin: 0px 20px 0px 10px">
+            <button id="connectBtn" class="pure-button pure-button-primary" style="display:none">Connect</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="content-wrapper"> 
+      <div class="pure-g">
+        <div class="pure-u-1 l-box">
+          <form class="pure-form pure-form-stacked">
+            <fieldset>
+              <legend class="form-title">Create Review Form</legend>
+              <div id="questionWrapper">
+                <div class="pure-g">
+                  <div class="pure-u-5-12">
+                    <label>Question</label>
+                  </div>
+                  <div class="pure-u-1-24"></div>
+                  <div class="pure-u-1-3">
+                    <label>Question Type</label>
+                  </div>
+                  <div class="pure-u-1-6"></div>
+                  <div class="pure-u-5-12">
+                    <input class="pure-input-1" type="text" placeholder="Enter a question" name="questions[]"/>
+                  </div>
+                  <div class="pure-u-1-24"></div>
+                  <div class="pure-u-1-3">
+                    <select name="question-types[]" class="pure-input-1">
+                      <option hidden selected value="">Select a question type</option>
+                      <option value="0">Text</option>
+                      <option value="1">Checkbox</option>
+                    </select>
+                  </div>
+                  <div class="pure-u-1-6"></div>
+                  <div class="pure-u-5-12">
+                    <small class="validation-error question-validation"></small>
+                  </div>
+                  <div class="pure-u-1-24"></div>
+                  <div class="pure-u-1-3">
+                    <small class="validation-error question-type-validation"></small>
+                  </div>
+                  <div class="pure-u-1-6"></div>
+                </div>
+              </div>
+              <div class="pure-u-1">
+                <button class="pure-button button-success" style="margin-top: 15px" id="addQuestionBtn" type="button">Add Question</button>
+              </div>
+              <div class="pure-u-1">
+                <button id="createReviewFormBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+        <div class="pure-u-1 l-box">
+          <div id="create-review-form-info"></div>
+        </div>
+        <div class="pure-u-1 l-box">
+          <form class="pure-form pure-form-stacked">
+            <fieldset>
+              <legend class="form-title">Get Review Form</legend>
+              <div id="questionWrapper">
+                <div class="pure-g">
+                  <div class="pure-u-1">
+                    <label>Review Form Index</label>
+                  </div>
+                  <div class="pure-u-1">
+                    <select id="get-review-form-index" class="pure-input-1">
+                      <option hidden selected value="">Select a Review Form index</option>
+                    </select>
+                  </div>
+                  <div class="pure-u-1">
+                    <small class="validation-error" id="get-review-form-index-validation"></small>
+                  </div>
+                </div>
+              </div>
+              <div class="pure-u-1">
+                <button id="getReviewFormBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+        <div class="pure-u-1 l-box">
+          <div id="get-review-form-info"></div>
+          <div id="get-review-form-table" style="display:none">
+            <table class="pure-table pure-table-bordered">
+              <thead>
+                <tr>
+                  <th>Question</th>
+                  <th>Question Type</th>
+                </tr>
+              </thead>
+              <tbody id="rfTbody">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="pure-u-1 l-box">
+        <form class="pure-form pure-form-stacked">
+          <fieldset>
+            <legend class="form-title">Create Request</legend>
+            <label>Name</label>
+            <div>
+              <div class="pure-g">
+                <div class="pure-u-20-24">
+                  <input id="requestName" type="text" name="requestName" placeholder="Enter a name for the request" class="pure-input-1"/>
+                </div>
+              </div>
+              <div class="pure-g">
+                <div class="pure-u-20-24">
+                  <small id="name-validation" class="validation-error"></small>
+                </div>
+              </div>
+            </div>
+            <label>Review Form Index</label>
+            <div class="pure-g">
+              <div class="pure-u-20-24">
+                <input id="reviewFormIndex" type="number" step="1" name="rewardPerReview" placeholder="Enter the Review Form Index" class="pure-input-1"/>
+              </div>
+            </div>
+            <div class="pure-g">
+              <div class="pure-u-20-24">
+                <small id="review-form-index-validation" class="validation-error"></small>
+              </div>
+            </div>
+            <label>Reviewers</label>
+            <div id="reviewerWrapper">
+              <div class="pure-g">
+                <div class="pure-u-20-24">
+                  <input class="pure-input-1" type="text" placeholder="Enter a reviewer" name="reviewers[]"/>
+                </div>
+                <div class="pure-u-1-6"></div>
+                <div class="pure-u-20-24">
+                  <small class="validation-error"></small>
+                </div>
+              </div>
+            </div>
+            <button class="pure-button button-success" style="margin-top: 15px" id="addReviewersBtn" type="button">Add Reviewer</button>
+            <label>Targets</label>
+            <div id="targetWrapper">
+              <div class="pure-g">
+                <div class="pure-u-20-24">
+                  <input class="pure-input-1" type="text" placeholder="Enter a target" name="targets[]"/>
+                </div>
+                <div class="pure-u-1-6"></div>
+                <div class="pure-u-20-24">
+                  <small class="validation-error"></small>
+                </div>
+              </div>
+            </div>
+            <button class="pure-button button-success" style="margin-top: 15px" id="addTargetsBtn" type="button">Add Target</button>
+            <label>IPFS Hash</label>
+            <div class="pure-g">
+              <div class="pure-u-20-24">
+                <input id="ipfsHash" type="text" name="ipfsHash" placeholder="Enter the IPFS Hash" class="pure-input-1"/>
+              </div>
+            </div>
+            <label>Reward per Review</label>
+            <div class="pure-g">
+              <div class="pure-u-20-24">
+                <input id="rewardPerReview" type="number" step="any" name="rewardPerReview" placeholder="Enter the reward per review" class="pure-input-1"/>
+              </div>
+            </div>
+            <div class="pure-g">
+              <div class="pure-u-20-24">
+                <small id="reward-validation" class="validation-error"></small>
+              </div>
+            </div>
+            <button id="createRequestBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
+          </fieldset>
+        </form>
+      </div>
+      <div class="pure-u-1 l-box">
+        <div id="msg-transaction"></div>
+      </div>
+      <div class="pure-u-1 l-box">
+        <form class="pure-form pure-form-stacked">
+          <fieldset>
+            <legend class="form-title">Get Review Request</legend>
+            <label>Review Request Name</label>
+            <div class="pure-g">
+              <div class="pure-u-20-24">
+                <input id="getRequestName" type="text" class="pure-input-1" placeholder="Enter the request name" />
+              </div>
+              <div class="pure-u-20-24">
+                <small id="get-request-name-validation" class="validation-error"></small>
+              </div>
+            </div>
+            <button id="getRequestBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
+          </fieldset>
+        </form>
+        <div class="pure-u-1 l-box">
+          <div id="request-info" style="display:none"></div>
+          <div id="request-table" style="display:none">
+            <table class="pure-table">
+              <tbody>
+                <tr class="pure-table-odd">
+                  <td>Reviewers</td>
+                  <td id="requestReviewersTd"></td>
+                </tr>
+                <tr>
+                  <td>Targets</td>
+                  <td id="requestTargetsTd"></td>
+                </tr>
+                <tr class="pure-table-odd">
+                  <td>IPFS Hash</td>
+                  <td id="requestIpfsHashTd"></td>
+                </tr>
+                <tr>
+                  <td>Reward per review</td>
+                  <td id="requestRewardTd"></td>
+                </tr>
+                <tr class="pure-table-odd">
+                  <td>Is closed?</td>
+                  <td id="requestClosedTd"></td>
+                </tr>
+                <tr>
+                  <td>Reviews</td>
+                  <td id="requestReviewsTd"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="pure-u-1 l-box">
+        <form class="pure-form pure-form-stacked">
+          <fieldset>
+            <legend class="form-title">Close Review Request</legend>
+            <label>Review Request Name</label>
+            <div class="pure-g">
+              <div class="pure-u-20-24">
+                <input id="closeRequestName" type="text" class="pure-input-1" placeholder="Enter the request name" />
+              </div>
+              <div class="pure-u-20-24">
+                <small id="close-request-name-validation" class="validation-error"></small>
+              </div>
+            </div>
+            <button id="closeRequestBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
+          </fieldset>
+        </form>
+        <div class="pure-u-1 l-box">
+          <div id="close-request-info"></div>
+        </div>
+      </div>
+      <div class="pure-u-1 l-box">
+        <form class="pure-form pure-form-stacked">
+          <fieldset>
+            <legend class="form-title">Submit Review</legend>
+            <label>Review Request Name</label>
+            <div class="pure-g">
+              <div class="pure-u-14-24">
+                <select class="pure-input-1" id="submit-review-name" onchange="resetSubmitQuestions()">
+                  <option selected hidden value="">Select the review request name</option>
+                  <option value="Limits1">Limits1</option>
+                </select>
+              </div>
+              <div class="pure-u-1-24"></div>
+              <div class="pure-u-3-24">
+                <button type="button" style="margin-top:5px" class="pure-button button-warning" id="getRequestQuestionsBtn">Get Request Questions</button>
+              </div>
+              <div class="pure-u-20-24">
+                <small id="submit-review-name-validation" class="validation-error"></small>
+              </div>
+            </div>
+            <div id="submit-review-questions-wrapper" style="display:none"></div>
+            <button id="submitReviewBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
+          </fieldset>
+        </form>
+        <div class="pure-u-1 l-box">
+          <div id="submit-review-info"></div>
+        </div>
+      </div>
+    </div>
+    <script src="web3.js" type="text/javascript"></script>
+  </body>
+</html>

@@ -1,4 +1,5 @@
-pragma solidity 0.8.10;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.13;
 
 contract IpfsDeresyRequests {
     
@@ -23,9 +24,9 @@ contract IpfsDeresyRequests {
     
     // Creating a request
     function createRequest(string memory _name, address[] memory reviewers, string[] memory targets, string memory formIpfsHash, uint256 rewardPerReview) external payable{
-        require(reviewers.length > 0,"Deresy: Reviewers cannot be null");
-        require(targets.length == reviewers.length,"Deresy: Needs to be same number of arguments for targets as well for reviewers");
-        require(rewardPerReview > 0,"Deresy: rewardPerReview cannot be empty");
+        require(reviewers.length > 0,"Deresy: Reviewers cannot be empty");
+        require(targets.length > 0,"Deresy: Targets cannot be empty");
+        require(rewardPerReview > 0,"Deresy: rewardPerReview must be greater than 0");
         require(msg.value >= (reviewers.length * targets.length * rewardPerReview),"Deresy: msg.value invalid");
         
         reviewRequests[_name].sponsor = msg.sender;
@@ -62,8 +63,8 @@ contract IpfsDeresyRequests {
       reviewRequests[_name].fundsLeft = 0;
   }
 
-  function getRequest(string memory _name) public view returns (address[] memory reviewers,string[] memory targets,string memory formIpfsHash,uint256 rewardPerReview,Review[] memory reviews ){
-    return (reviewRequests[_name].reviewers,reviewRequests[_name].targets,reviewRequests[_name].formIpfsHash,reviewRequests[_name].rewardPerReview, reviewRequests[_name].reviews);
+  function getRequest(string memory _name) public view returns (address[] memory reviewers,string[] memory targets,string memory formIpfsHash,uint256 rewardPerReview,Review[] memory reviews, bool isClosed){
+    return (reviewRequests[_name].reviewers,reviewRequests[_name].targets,reviewRequests[_name].formIpfsHash,reviewRequests[_name].rewardPerReview, reviewRequests[_name].reviews, reviewRequests[_name].isClosed);
   }
 
 }

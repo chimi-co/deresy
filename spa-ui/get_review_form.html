@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="app.css" type="text/css">
+    <script src="app.js" type="text/javascript"></script>
+    <script src="getReviewForm.js" type="text/javascript"></script>
+    <title>DERESY</title>
+  </head>
+  <body>
+    <div class="header">
+      <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
+        <a class="pure-menu-heading" href="./">DERESY</a>
+  
+        <ul class="pure-menu-list">
+          <li class="pure-menu-item"><div class="pure-menu-text" id="enableMM"></div></li>
+          <li class="pure-menu-item" style="margin: 0px 20px 0px 10px">
+            <button id="connectBtn" class="pure-button pure-button-primary" style="display:none">Connect</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="content-wrapper">
+      <div class="pure-u-11-12 l-box alert warning" id="network-info" style="display:none;">Please connect to the Arbitrum Network</div> 
+      <div class="pure-g">
+        <div class="pure-u-1 l-box">
+          <form class="pure-form pure-form-stacked">
+            <fieldset>
+              <legend class="form-title">Get Review Form</legend>
+              <div id="get-review-form-div" style="display:none">
+                <div id="questionWrapper">
+                  <div class="pure-g">
+                    <div class="pure-u-1">
+                      <label>Review Form Index</label>
+                    </div>
+                    <div class="pure-u-1">
+                      <select id="get-review-form-index" class="pure-input-1">
+                        <option hidden selected value="">Select a Review Form index</option>
+                      </select>
+                    </div>
+                    <div class="pure-u-1">
+                      <small class="validation-error" id="get-review-form-index-validation"></small>
+                    </div>
+                  </div>
+                </div>
+                <div class="pure-u-1">
+                  <button id="getReviewFormBtn" type="button" class="pure-button pure-button-primary" style="margin-top:1%;">Send</button>
+                </div>
+              </div>
+              <div id="no-results-message" style="display: none;"></div>
+            </fieldset>
+          </form>
+        </div>
+        <div class="pure-u-1 l-box">
+          <div id="get-review-form-info"></div>
+          <div id="get-review-form-table" style="display:none;">
+            <table class="pure-table pure-table-bordered">
+              <thead>
+                <tr>
+                  <th>Question</th>
+                  <th>Question Type</th>
+                </tr>
+              </thead>
+              <tbody id="rfTbody">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="web3.js" type="text/javascript"></script>
+  </body>
+</html>
