@@ -52,6 +52,7 @@ contract DeresyRequests {
     reviewForms.push(reviewForm(questions,questionTypes, choices));
     reviewFormsTotal += 1;
     emit CreatedReviewForm(reviewForms.length - 1);
+    return reviewForms.length - 1;
   }
 
   // Creating a request 
