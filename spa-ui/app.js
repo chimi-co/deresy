@@ -1,4 +1,5 @@
-const ARBITRUM_NETWORK_ID = 42161;
+const ARBITRUM_NETWORK_ID = 421611;
+
 const abi = [
   {
     anonymous: false,
@@ -304,7 +305,7 @@ const abi = [
 
 let account;
 let web3;
-const contractAddress = "0x50e9a780bde93ccfa592ce9e981d5dbaf9cfc107";
+const contractAddress = "0xc72e3aE0EdB867aF28591686F98Fd9064A78E889";
 
 const handleAccountsChanged = (accounts) => {
   if (accounts.length === 0) {
