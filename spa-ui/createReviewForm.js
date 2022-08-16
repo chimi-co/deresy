@@ -77,7 +77,7 @@ const createReviewForm = async () => {
   const validateCreateReviewForm = () => {
     let validQuestions = false;
     let validQuestionTypes = false;
-    let validQuestionChoices = false;
+    let validQuestionChoices = true;
     
     let questionFields = document.getElementsByName('questions[]');
     
@@ -105,21 +105,21 @@ const createReviewForm = async () => {
         validationMessage.style = "display:block";
         validQuestionTypes = false;
       }
-    });
-
-    let questionChoices = document.getElementsByName('choices[]');
-
-    questionChoices.forEach(function(choice, index){
-      var validationMessage = choice.parentNode.parentNode.querySelector('.choice-validation');
-      if(choice.value && questionTypeFields){
-        validationMessage.style = "display:none";
-        validQuestionChoices = true;
-      } else {
-        validationMessage.innerHTML = "This is a required field";
-        validationMessage.style = "display:block";
-        validQuestionChoices = false;
+      if(questionType.value == 2) {
+        let questionChoices = questionType.parentNode.parentNode.querySelectorAll('[name="choices[]"]');
+        questionChoices.forEach(function(choice){
+          var validationMessage = choice.parentNode.parentNode.querySelector('.choice-validation');
+          if(choice.value){
+            validationMessage.style = "display:none";
+          } else {
+            validationMessage.innerHTML = "This is a required field";
+            validationMessage.style = "display:block";
+            validQuestionChoices = false;
+          }
+        });
       }
     });
+
     
     return validQuestions && validQuestionTypes && validQuestionChoices;
   };
