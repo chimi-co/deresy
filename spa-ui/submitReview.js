@@ -99,7 +99,7 @@ const submitReview = async () => {
       targetIndexValidationMessage.style = "display:block";
       validTargetIndex = false;
     }
-    
+
     answers = document.getElementsByClassName('submit-review-answers');
     for(let answer of answers) {
       var validationMessage = answer.type == "radio" ?  answer.parentNode.parentNode.parentNode.querySelector('.validation-error') : answer.parentNode.parentNode.querySelector('.validation-error');
@@ -176,6 +176,10 @@ const submitReview = async () => {
             document.getElementById("submitReviewBtn").style = "display:block";
           }
           document.getElementById("submit-review-questions-wrapper").style = "display:block";
+          const textAreas = document.getElementsByClassName("textarea-markdown");
+          for (let textArea of textAreas) {
+            new SimpleMDE({ element: textArea, forceSync: true });
+          }
         }
       } catch (error) {
         throw error;
@@ -201,7 +205,7 @@ const submitReview = async () => {
   };
   
   function createTextQuestion(question) {
-    let questionHTML = `<label>${question}</label><div class="pure-g"><div class="pure-u-20-24"><textarea class="submit-review-answers" class="pure-input-1" type="text" placeholder="Enter your answer" rows="4" cols="90"></textarea></div><div class="pure-u-20-24"><small class="validation-error"></small></div></div><br/>`;  
+    let questionHTML = `<label>${question}</label><div class="pure-g"><div class="pure-u-20-24"><textarea class="submit-review-answers pure-input-1 textarea-markdown" type="text" placeholder="Enter your answer" rows="4" cols="90"></textarea></div><div class="pure-u-20-24"><small class="validation-error"></small></div></div><br/>`;  
     return questionHTML;
   };
   
