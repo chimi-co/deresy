@@ -40,14 +40,21 @@ const fillReviewsTable = (reviewForm, request) => {
       reviewTr.appendChild(reviewTd);
       let reviewsText = "";
       reviewsText += `<h3 style="margin:0% !important">Review ${index+1} by (${review.reviewer})</h3><br><strong>Target</strong><br><a href="${request.targets[review.targetIndex]}" target="_blank">${request.targets[review.targetIndex]}</a><br><br><strong>Target IPFS Hash</strong><br><a href="https://ifps.io/ipfs/${request.targetsIPFSHashes[review.targetIndex]}" target="_blank">${request.targetsIPFSHashes[review.targetIndex]}</a><br><br>`
+      console.log('review', review)
+      console.log('reviewForm', reviewForm)
       review.answers.forEach((answer, index) =>{
-        reviewsText += `<strong>${reviewForm[0][index]}</strong><br>${answer}<br><br>`
+        if(reviewForm[1][index] == '0'){
+          reviewsText += `<strong>${reviewForm[0][index]}</strong><br><textarea class="textarea-markdown">${answer}</textarea><br><br>`
+        } else{
+          reviewsText += `<strong>${reviewForm[0][index]}</strong><br>${answer}<br><br>`
+        }
       });
       reviewsText += "<br>"
       reviewTd.innerHTML = reviewsText;
+      console.log('reviewsText', reviewsText)
       reviewsTbody.appendChild(reviewTr);
     });
-    reviewsTable.style = "display: block;";
+    reviewsTable.style = "display: table; width: 100%;";
   } else {
     noReviewsDiv.innerHTML = '<strong>There are no available reviews for this request yet</strong>'
     reviewsTable.style = "display:none;"
@@ -104,6 +111,12 @@ const fillReviewFormTable = async (reviewForm) => {
     rFormChoiceTd.innerHTML= reviewForm[2][index].join('<br>');
     rfTbody.appendChild(rFormTr);
   });
+  const textAreas = document.getElementsByClassName("textarea-markdown");
+  console.log('textAreas', textAreas.length)
+  for (let textArea of textAreas) {
+    const s = new SimpleMDE({ element: textArea, toolbar: false, spellChecker: false, status: false });
+    s.togglePreview();
+  }
   reviewFormTable.style = "display: block;margin-top: 5%;";
 };
 

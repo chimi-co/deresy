@@ -1,6 +1,6 @@
 {
 	"compiler": {
-		"version": "0.8.14+commit.80d49f37"
+		"version": "0.8.19+commit.7dd6d404"
 	},
 	"language": "Solidity",
 	"output": {
@@ -320,7 +320,7 @@
 		"compilationTarget": {
 			"contracts/DeresyRequests.sol": "DeresyRequests"
 		},
-		"evmVersion": "london",
+		"evmVersion": "paris",
 		"libraries": {},
 		"metadata": {
 			"bytecodeHash": "ipfs"
@@ -333,11 +333,11 @@
 	},
 	"sources": {
 		"contracts/DeresyRequests.sol": {
-			"keccak256": "0x0f4e9adceea1bcdd76f0533eeeea869e4bd80c21b6a358101711558cdd831981",
+			"keccak256": "0xafd67fdc37afe43c688084a4fdb9fdaf7ebbf38e8adb1129593f4fe5fc03bbe3",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://0158ec5cf9ab4d4283f5af9e579f920883dcfc012326460a9c0061446a02293b",
-				"dweb:/ipfs/QmRQmUtQie5fb4bhFwJnbJcdyqZnyqCVvrFCwJtia4Rokp"
+				"bzz-raw://6864763b322db16eaad7513ca55ebbd3ec9091f11962a89f7eeddb5f80501c20",
+				"dweb:/ipfs/QmZDRxHk6jkvxWh97BN53v7ngiXdQ2EkN19a9pkVfxtVwj"
 			]
 		}
 	},

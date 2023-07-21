@@ -100,3 +100,5 @@ window.onload = async function () {
     .getElementById("getReviewFormBtn")
     .addEventListener("click", getReviewForm);
 };
+
+console.log("getReviewForm.js loaded")
