@@ -28,14 +28,17 @@ const createReviewForm = async () => {
         questionsChoicesValues.push(choicesValues);
       })
 
+      const schemaId = document.getElementById('schema-id').value
+      const isValidSchemaId = validateSchemaId()
       const validData = validateCreateReviewForm();
 
-      if(validData) {
+      if(validData && isValidSchemaId) {
         const data = await contract.methods
         .createReviewForm(
           questionsValues,
           questionsChoicesValues,
           questionTypesValues,
+          schemaId
           )
           .encodeABI();
           
@@ -73,6 +76,22 @@ const createReviewForm = async () => {
       }
     }
   };
+
+  const validateSchemaId = (schemaId) => {
+    const schemaIdRegex = /^0x[a-fA-F0-9]{64}$/
+    const validationMessage = document.getElementsByClassName('schema-id-error')[0]
+
+    const isValid = schemaIdRegex.test(schemaId)
+
+    if (!isValid) {
+      validationMessage.innerHTML = 'Insert a valid EAS Schema Id'
+      validationMessage.style.display = 'block'
+    } else {
+      validationMessage.style.display = 'none'
+    }
+
+    return isValid
+  }
   
   const validateCreateReviewForm = () => {
     let validQuestions = false;
