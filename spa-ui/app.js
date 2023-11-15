@@ -1,5 +1,4 @@
-const ARBITRUM_NETWORK_ID = 421613;
-
+const ARBITRUM_NETWORK_ID = 42161;
 const abi = [
   {
     anonymous: false,
@@ -305,7 +304,7 @@ const abi = [
 
 let account;
 let web3;
-const contractAddress = "0x144c0fc5305a267B07BBabEe739706abcC73cd83";
+const contractAddress = "0x50e9a780bde93ccfa592ce9e981d5dbaf9cfc107";
 
 const handleAccountsChanged = (accounts) => {
   if (accounts.length === 0) {
@@ -376,7 +375,7 @@ window.onload = async function () {
       ethereum.
       request({ method: "eth_chainId" })
       .then(handleNetworkMessage)
-      //.then(getContractVersion);
+      .then(getContractVersion);
     } catch (error) {
       console.log(error);
     }
